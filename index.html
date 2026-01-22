@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-49TJQWLWDQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-49TJQWLWDQ');
+  </script>
+
+  <meta charset="utf-8">
+  <meta name="description" content="GammaZero: Learning to Guide Belief-Space Search for Long-Horizon POMDPs with Generalizable Graph Representations">
+  <meta name="keywords" content="graph neural networks (GNN), POMDP, belief space planning, partial observability, Monte Carlo Tree Search, GammaZero">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GammaZero: Learning to Guide Belief-Space Search for POMDPs</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <link rel="icon" href="./resources/favicon.ico">
+  
+  <script src="https://kit.fontawesome.com/006a5775d5.js" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <style>
+    /* --- NEW Accordion Dropdown Styles --- */
+    .section-toggle {
+        font-size: 0.8rem;
+        font-weight: normal;
+        cursor: pointer;
+        color: #3273dc; /* Bulma link color */
+        margin-left: 15px;
+        vertical-align: middle;
+        text-decoration: none;
+    }
+    .section-toggle:hover {
+        text-decoration: underline;
+    }
+
+    /* This is the new card container */
+    .dropdown-item {
+        margin-bottom: 1rem; /* Add spacing between dropdowns */
+    }
+
+    .dropdown-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 15px 20px;
+        
+        display: flex;
+        align-items: center; /* Vertically center icon and text */
+        justify-content: space-between; /* Pushes icon to the right */
+
+        background-color: #ffffff;
+        border: 1px solid #dbdbdb;
+        border-radius: 5px;
+        box-shadow: 0 3px 5px rgba(0,0,0,0.03);
+        
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .dropdown-header:hover {
+        background-color: #f9f9f9;
+        box-shadow: 0 5px 8px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+    }
+    
+    /* Style the text part of the header to wrap properly */
+    .header-text {
+        flex-grow: 1; /* Allows text to take up available space */
+        padding-right: 15px; /* Space between text and icon */
+        /* This part is critical for mobile */
+        word-break: break-word;
+    }
+
+    /* Style the icon */
+    .dropdown-header .icon {
+        flex-shrink: 0; /* Prevents icon from shrinking */
+        transition: transform 0.2s ease-in-out;
+        font-size: 1rem;
+        color: #7a7a7a; /* Make icon a bit subtler */
+    }
+
+    /* Animate the icon when active */
+    .dropdown-header.active .icon {
+        transform: rotate(180deg);
+    }
+    .dropdown-header.active {
+        background-color: #f5f5ff; /* Lightened active color */
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .dropdown-content {
+        display: none;
+        padding: 20px 25px;
+        background-color: #ffffff;
+        border: 1px solid #dbdbdb;
+        border-top: none; /* Avoid double border */
+        
+        /* Connect it to the header */
+        margin-top: -1px; 
+        border-radius: 0 0 5px 5px;
+        
+        /* Remove old border-left styles */
+        margin-left: 0;
+        border-left: none;
+    }
+    .dropdown-content p, .dropdown-content ul {
+        font-size: 1rem;
+        line-height: 1.6;
+        
+        /* --- THIS IS THE NEW FIX --- */
+        white-space: normal;  /* Resets any 'nowrap' from conflicts */
+        word-break: break-word; /* Forces long words/text to wrap */
+    }
+
+    /* --- FIX FOR BIBTEX OVERFLOW --- */
+    pre, code {
+        white-space: pre-wrap;  /* Allows preformatted text to wrap */
+        word-break: break-all; /* Breaks long strings if necessary */
+    }
+
+    /* Keep specified images always visible */
+    .visible-image {
+        margin: 20px auto;
+        display: block;
+        max-width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+
+    /* Responsive images */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Center the global toggle button */
+    .global-toggle-container {
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    /* Styles for new HTML results tables */
+    .results-table-container {
+        overflow-x: auto;
+        margin: 25px 0;
+    }
+    .results-table {
+        width: 100%;
+        min-width: 1000px; /* Ensure table is wide enough to scroll */
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    .results-table th, .results-table td {
+        border: 1px solid #dbdbdb;
+        padding: 8px 10px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .results-table th {
+        background-color: #f5f5f5;
+        font-weight: 600;
+    }
+    .results-table .domain-col {
+        text-align: left;
+        font-weight: 600;
+        min-width: 80px;
+    }
+    .results-table .diff-col {
+        font-weight: 600;
+    }
+    
+    /* Color coding from LaTeX file */
+    .c-high { background-color: #00A3A1; color: white; } /* 90-100% */
+    .c-med { background-color: #64D1C6; } /* 75-89% */
+    .c-low { background-color: #C8F1EA; } /* 50-74% */
+    
+    .p-high { background-color: #BBA0E5; } /* 1.00+ */
+    .p-med { background-color: #DCC4F6; } /* 0.75-0.99 */
+    .p-low { background-color: #F4EBFC; } /* 0.50-0.74 */
+    
+    .results-table .c-high strong { color: white !important; }
+
+    .results-table th[colspan] {
+        background-color: #e0e0e0;
+    }
+    
+    .table-caption {
+        font-size: 0.9rem;
+        font-style: italic;
+        color: #555;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    /* New Table 2 Header Colors */
+    .header-baselines { background-color: #ffcccc !important; } /* Light Red */
+    .header-gabar { background-color: #ccffcc !important; } /* Light Green */
+    .header-ablations { background-color: #cceeff !important; } /* Light Blue */
+
+
+  </style>
+</head>
+<body>
+  
+<section class="hero">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">GammaZero: Learning to Guide Belief-Space Search for Long-Horizon POMDPs with Generalizable Graph Representations</h1>
+          <div class="is-size-4 publication-authors">
+            <span class="author-block">
+              <a href="https://www.linkedin.com/in/rajeshdm/">Rajesh Mangannavar</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <a href="https://web.engr.oregonstate.edu/~tadepall/">Prasad Tadepalli</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+              <br><br>
+              <img src="./resources/OSU_horizontal_2C_O_over_B.png" width="20%" alt="Oregon State University Logo" style="width: 20%; min-width: 150px;">
+            </span>
+          </div>
+
+          <h2 class="is-size-4 has-text-weight-bold has-text-success-dark mt-4 mb-4">
+            A novel uncertainty-aware graph representation for POMDPs that enables learning from small problems and generalizing to instances 2-6× larger—achieving comparable performance to BetaZero on same-sized problems while enabling zero-shot transfer to larger scales without retraining.
+          </h2>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="./resources/GammaZero_AAAI.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2510.14035"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://anonymous.4open.science/r/GammaZero_main"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section pt-0 pb-4">
+    <div class="container global-toggle-container">
+      <button id="global-toggle" class="button is-info is-rounded" data-action="expand">Expand All Sections</button>
+    </div>
+</section>
+
+<section class="section pt-0">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-two-thirds">
+        <h2 class="title is-2 has-text-centered">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            We introduce an uncertainty-aware graph representation framework for learning to guide planning in Partially Observable Markov Decision Processes (POMDPs). Unlike existing approaches that require domain or problem size specific neural architectures, GammaZero leverages a unified graph-based belief representation that enables generalization across problem sizes within a domain. Our key insight is that belief states can be systematically transformed into uncertainty-aware graphs where structural patterns learned on small problems transfer to larger instances. We employ a graph neural network with a decoder architecture to learn value functions and policies from expert demonstrations on computationally tractable problems, then apply these learned heuristics to guide Monte Carlo tree search on larger problems. Experimental results on standard POMDP benchmarks demonstrate that GammaZero achieves comparable performance to BetaZero when trained and tested on the same-sized problems, while enabling zero-shot generalization to problems with grid areas 2-6× larger than those seen during training.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-three-quarters">
+
+        <div class="section-container">
+            <h2 class="title is-2">Why Learning for POMDP Planning?
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>POMDPs model real-world uncertainty:</b> From autonomous driving to robotics, agents must act with incomplete information.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Partially Observable Markov Decision Processes (POMDPs) provide a principled framework for sequential decision-making under uncertainty. This arises naturally in autonomous driving (limited sensor field-of-view), robotic manipulation (object properties inferred through interaction), and subsurface exploration (sparse observations). The ability to reason explicitly about uncertainty makes POMDPs ideal for safety-critical applications.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Online planners struggle with long horizons:</b> Without effective heuristics, MCTS fails to look far enough ahead.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Online planning algorithms like POMCP and POMCPOW use Monte Carlo tree search to focus on reachable belief states. However, without effective heuristics, these methods struggle to search deep enough for long-horizon tasks where rewarding action sequences require extended information gathering.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>AlphaZero showed learning can replace heuristics:</b> Learned approximations can guide search more effectively than hand-crafted rules.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>The success of AlphaZero in fully observable games demonstrated that learned neural network approximations can effectively replace hand-crafted heuristics. BetaZero extended this to POMDPs, but requires fixed-size inputs. GammaZero pushes further by enabling size generalization through graph representations.</p>
+                </div>
+            </div>
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">The Challenge with Existing Approaches
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Fixed-size belief representations:</b> BetaZero requires separate training for each problem size.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Existing learning-based POMDP planners like BetaZero rely on fixed-dimensional belief representations (typically statistical summaries). This creates a representational bottleneck—scaling from 5 to 10 objects requires retraining with a new architecture, making deployment expensive.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>No cross-size generalization:</b> Models trained on small problems cannot be applied to larger ones.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Fixed-dimensional approaches cannot process inputs of different sizes. A model trained on RockSample(5,5) simply cannot take RockSample(15,15) as input. This means expensive optimal planners must be run on each new scale, or models retrained from scratch.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Belief uncertainty not explicitly captured:</b> Standard representations lose structural patterns that enable transfer.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>While GNNs have proven effective for fully observable planning (e.g., GABAR), extending them to partial observability is non-trivial. The key challenge is encoding belief uncertainty while preserving the structural patterns that enable generalization—something not addressed by prior work.</p>
+                </div>
+            </div>
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">GammaZero's Key Insight
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Beliefs as uncertainty-aware graphs:</b> Transform particle beliefs into graphs that explicitly encode probabilistic relationships.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>GammaZero transforms particle-based belief states into structured graphs that capture both uncertainty and action-centric relationships. The graph topology itself encodes belief uncertainty—attribute nodes exist only when sufficient particle support justifies inclusion. This naturally handles multimodal beliefs through node presence/absence.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Graph structure enables size generalization:</b> The same GNN can process problems of varying sizes.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Graph neural networks naturally handle variable-sized inputs through local message passing. Adding more rocks to RockSample simply adds more object nodes—the graph topology and edge types remain unchanged. This allows the same trained weights to process problems of arbitrary scale.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Combine learned guidance with MCTS:</b> Neural networks provide value estimates and action priorities for efficient search.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>GammaZero trains offline on expert demonstrations from small problems, learning both value functions V(b) and policies P(a|b). During execution, these guide MCTS: the policy prioritizes promising actions during expansion, and the value function evaluates leaf nodes, replacing expensive rollouts.</p>
+                </div>
+            </div>
+
+            <img src="./resources/gz_graph_construction.png" alt="GammaZero Belief Graph Construction" class="visible-image" style="width: 100%; background-color: white;">
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">Method Overview
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Graph representation with 4 node types:</b> Objects, Attributes (belief-weighted), Actions, and a Global node.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>The graph consists of: <b>Object nodes</b> (entities and locations), <b>Attribute instance nodes</b> (properties with belief probability above threshold τ), <b>Action nodes</b> (parameterized actions like move, check, sample), and a <b>Global node</b> for graph-level aggregation. Edges encode attribute-object, action-object, and attribute-action relationships with belief-weighted features.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Belief-driven sparsity:</b> Attribute nodes created only when particle support exceeds threshold τ.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Rather than instantiating all possible attribute groundings, we create nodes only when aggregated particle support exceeds threshold τ. This encodes the belief distribution through graph topology (existence implies plausibility), reduces complexity by avoiding unlikely hypotheses, and enables learning from structural presence/absence.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>GNN encoder + dual output heads:</b> Message passing produces both value estimates and action probabilities.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>The GNN performs L rounds of message passing where edges, nodes, and the global feature are sequentially updated. The final global embedding feeds into two output heads: V_θ(G) for value estimation and P_θ(a|G) for action probabilities. The global node enables rapid information propagation crucial for large graphs.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>MCTS integration:</b> Learned approximations enhance action prioritization, value estimation, and action selection.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>During online planning, learned approximations enhance MCTS in three ways: (1) <b>Action prioritization</b>: sample actions from P_θ instead of uniformly; (2) <b>Value estimation</b>: replace expensive rollouts with V_θ lookup at leaf nodes; (3) <b>Root action selection</b>: combine visit counts with Q-values using the PUCT formula for robust selection.</p>
+                </div>
+            </div>
+
+            <img src="./resources/gz_overview.png" alt="GammaZero Framework Overview" class="visible-image" style="width: 90%;">
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">Results
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Matches BetaZero on same-sized problems:</b> GammaZero achieves comparable performance when trained and tested on identical sizes.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>On LightDark(10), GammaZero achieves 17.5±1.2, outperforming BetaZero's 16.77±1.28. On RockSample(15,15), GammaZero achieves 20.5±0.8 compared to BetaZero's 20.15±0.71. Both learning-based methods substantially outperform classical planners like POMCPOW (11.14±0.59), validating that learned heuristics are effective.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Zero-shot generalization to 2-6× larger problems:</b> Models trained on small instances transfer to significantly larger scales.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>GammaZero trained on RockSample(5,5) to (10,10) achieves strong performance on (15,15), (20,20), and even (25,25). On MultiObjectSearch, training on 2-3 objects generalizes to 4-6 objects. This unique capability—impossible for fixed-dimensional methods like BetaZero—decouples training complexity from deployment scale.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Graceful degradation at scale:</b> Performance degrades gradually, not catastrophically, as problem size increases.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Across all domains, GammaZero's performance degrades gradually rather than catastrophically as problem size increases beyond training distribution. Even on RockSample(25,25), where classical planners timeout, the raw policy network achieves best performance (4.8±1.2), demonstrating structural pattern transfer.</p>
+                </div>
+            </div>
+            
+            <div class="table-caption" style="margin-top: 25px;">
+                <b>Table 1:</b> Same-size performance comparison (Returns ± SE). All methods trained and tested on the same problem size.
+            </div>
+            <div class="results-table-container">
+                <table class="results-table" style="min-width: 900px;">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="domain-col">Domain</th>
+                            <th colspan="3" class="header-gabar"><b>GammaZero</b></th>
+                            <th colspan="3" class="header-baselines">BetaZero</th>
+                            <th colspan="3" class="header-ablations">Classical Baselines</th>
+                        </tr>
+                        <tr>
+                            <th>Full</th><th>Raw P<sub>θ</sub></th><th>Raw V<sub>θ</sub>*</th>
+                            <th>Full</th><th>Raw P<sub>θ</sub></th><th>Raw V<sub>θ</sub>*</th>
+                            <th>POMCPOW</th><th>DESPOT</th><th>AdaOPS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="domain-col">LD(10)</td>
+                            <td class="c-high"><b>17.5±1.2</b></td><td>14.4±1.3</td><td>13.3±1.4</td>
+                            <td>16.77±1.28</td><td>13.74±1.33</td><td>12.70±1.46</td>
+                            <td>0.68±0.41</td><td>0.43±0.36</td><td>5.22±1.77</td>
+                        </tr>
+                        <tr><td colspan="10" style="background-color: #fafafa; height: 5px; border: 0;"></td></tr>
+                        <tr>
+                            <td class="domain-col">RS(15,15)</td>
+                            <td>20.5±0.8</td><td>11.1±2.0</td><td>9.1±2.2</td>
+                            <td>20.15±0.71</td><td>10.96±0.98</td><td>9.96±0.65</td>
+                            <td>11.14±0.59</td><td>18.44±0.69</td><td class="c-high"><b>20.67±0.72</b></td>
+                        </tr>
+                        <tr><td colspan="10" style="background-color: #fafafa; height: 5px; border: 0;"></td></tr>
+                        <tr>
+                            <td class="domain-col">MOS(5,3)</td>
+                            <td class="c-high"><b>18.0±1.5</b></td><td>10.8±1.8</td><td>9.9±2.0</td>
+                            <td colspan="3" style="color: #888;">---</td>
+                            <td>7.5±1.5</td><td>6.4±1.8</td><td>15.5±2.0</td>
+                        </tr>
+                        <tr><td colspan="10" style="background-color: #fafafa; height: 5px; border: 0;"></td></tr>
+                        <tr>
+                            <td class="domain-col">RG(5,2)</td>
+                            <td class="c-high"><b>12.5±2.0</b></td><td>5.6±2.2</td><td>6.3±2.0</td>
+                            <td colspan="3" style="color: #888;">---</td>
+                            <td>4.3±1.5</td><td>3.4±1.5</td><td>7.7±2.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-caption" style="margin-top: 25px;">
+                <b>Table 2:</b> Zero-shot generalization (Returns ± SE). GammaZero trained on small problems, tested on larger sizes. Classical baselines trained per-size for reference. <sup>†</sup>Search timeout/failure.
+            </div>
+            <div class="results-table-container">
+                <table class="results-table" style="min-width: 900px;">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="domain-col">Test Domain</th>
+                            <th colspan="3" class="header-gabar"><b>GammaZero (zero-shot transfer)</b></th>
+                            <th colspan="3" class="header-ablations">Classical Baselines (per-size)</th>
+                        </tr>
+                        <tr>
+                            <th>Full</th><th>Raw P<sub>θ</sub></th><th>Raw V<sub>θ</sub>*</th>
+                            <th>POMCPOW</th><th>DESPOT</th><th>AdaOPS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="domain-col">LightDark(10)</td>
+                            <td class="c-high"><b>15.2±1.5</b></td><td>12.1±1.6</td><td>11.2±1.7</td>
+                            <td>0.68±0.41</td><td>0.43±0.36</td><td>5.22±1.77</td>
+                        </tr>
+                        <tr><td colspan="7" style="background-color: #f0f0f0; height: 5px; border: 0;"></td></tr>
+                        <tr>
+                            <td class="domain-col">RockSample(15,15)</td>
+                            <td>17.8±1.2</td><td>11.1±2.0</td><td>9.1±2.2</td>
+                            <td>11.14±0.59</td><td>18.44±0.69</td><td class="c-high"><b>20.67±0.72</b></td>
+                        </tr>
+                        <tr>
+                            <td class="domain-col">RockSample(20,20)</td>
+                            <td>10.2±1.8</td><td>5.4±1.0</td><td>4.4±2.0</td>
+                            <td>10.22±0.47</td><td>0.0±0.0<sup>†</sup></td><td class="c-high"><b>11.66±0.49</b></td>
+                        </tr>
+                        <tr>
+                            <td class="domain-col">RockSample(25,25)</td>
+                            <td>3.5±2.0</td><td class="c-high"><b>4.8±1.2</b></td><td>3.9±1.5</td>
+                            <td>2.1±0.8</td><td>0.0±0.0<sup>†</sup></td><td>4.2±1.0</td>
+                        </tr>
+                        <tr><td colspan="7" style="background-color: #f0f0f0; height: 5px; border: 0;"></td></tr>
+                        <tr>
+                            <td class="domain-col">MOS(6,4)</td>
+                            <td class="c-high"><b>14.5±1.8</b></td><td>8.8±2.0</td><td>8.1±2.2</td>
+                            <td>5.5±1.6</td><td>4.8±1.8</td><td>12.2±2.0</td>
+                        </tr>
+                        <tr>
+                            <td class="domain-col">MOS(7,5)</td>
+                            <td class="c-high"><b>11.2±2.0</b></td><td>6.5±2.2</td><td>6.0±2.3</td>
+                            <td>3.8±1.8</td><td>3.2±2.0</td><td>9.0±2.2</td>
+                        </tr>
+                        <tr>
+                            <td class="domain-col">MOS(8,6)</td>
+                            <td class="c-high"><b>8.0±2.2</b></td><td>4.8±2.5</td><td>4.5±2.5</td>
+                            <td>0.0±0.0<sup>†</sup></td><td>0.0±0.0<sup>†</sup></td><td>5.8±2.5</td>
+                        </tr>
+                        <tr><td colspan="7" style="background-color: #f0f0f0; height: 5px; border: 0;"></td></tr>
+                        <tr>
+                            <td class="domain-col">Rearrange(6,4)</td>
+                            <td class="c-high"><b>9.2±2.0</b></td><td>4.5±2.3</td><td>5.0±2.2</td>
+                            <td>3.0±1.6</td><td>2.4±1.8</td><td>5.8±2.0</td>
+                        </tr>
+                        <tr>
+                            <td class="domain-col">Rearrange(7,4)</td>
+                            <td class="c-high"><b>6.8±2.2</b></td><td>3.2±2.5</td><td>3.8±2.3</td>
+                            <td>0.0±0.0<sup>†</sup></td><td>0.0±0.0<sup>†</sup></td><td>4.0±2.2</td>
+                        </tr>
+                        <tr>
+                            <td class="domain-col">Rearrange(8,5)</td>
+                            <td class="c-high"><b>4.5±2.5</b></td><td>2.2±2.5</td><td>2.8±2.5</td>
+                            <td>0.0±0.0<sup>†</sup></td><td>0.0±0.0<sup>†</sup></td><td>2.5±2.5</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Component Contribution Analysis</b>
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Both the policy network P_θ and value network V_θ contribute to GammaZero's performance. The "Raw P_θ" column shows policy-only performance (without MCTS), achieving 60-80% of full performance. The "Raw V_θ*" column shows one-step lookahead with the value network. The combination through MCTS consistently yields the best results, confirming that both networks provide complementary guidance for effective planning.</p>
+                </div>
+            </div>
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">Key Technical Insights
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Belief-driven sparsity is essential:</b> Creating attribute nodes only above threshold τ encodes uncertainty in topology.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Rather than instantiating nodes for all possible attribute-value assignments, we create nodes only when aggregated particle support exceeds threshold τ. This allows the graph structure itself to encode the belief distribution—node existence implies plausibility—while reducing computational complexity by pruning unlikely hypotheses.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Edge features encode rich belief information:</b> Type, role, belief strength, and particle support metadata.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Edge features capture multiple layers of information: one-hot encoding of edge type (action-object, attribute-object), edge role (owner vs. value), belief strength (probability), and particle support level (unanimous >95%, strong 70-95%, weak 30-70%, split <30%). This enables the model to distinguish confident beliefs from uncertain hypotheses.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Global node enables long-range information flow:</b> Critical for maintaining context as problems scale.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>The global node aggregates information from all nodes and edges at each message passing round. Without it, information would need to flow through many hops to reach distant parts of the graph. As problems scale up, this shortcut becomes essential—it allows the model to maintain a comprehensive view of the planning state regardless of graph size.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Domain-agnostic construction:</b> Same principles apply across localization, games, and manipulation domains.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>The graph construction is domain-agnostic—the same principles work for robot localization (LightDark), information gathering (RockSample), target search (MultiObjectSearch), and manipulation (Rearrangement). The model learns to interpret structural patterns (e.g., "high entropy on attribute nodes connected to an action indicates information-gathering value") rather than domain-specific features.</p>
+                </div>
+            </div>
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">Technical Details
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Training setup:</b> Expert data collected from optimal/near-optimal planners on small problems.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>We collect training data by running optimal or near-optimal planners on small problem instances. For each belief state encountered, we query the expert for the optimal action and Q-values, then compute discounted returns via backward induction. Training takes 2-4 hours per domain on an RTX 3080.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Graph construction:</b> Nodes (Object, Attribute, Action, Global) and belief-weighted edges encode uncertainty.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Given a particle belief, we construct a graph with four node types: Object nodes (entities and locations), Attribute instance nodes (created when particle support exceeds threshold τ), Action nodes (parameterized actions), and a Global node. Edges encode attribute-object, action-object, and attribute-action relationships with belief-weighted features.</p>
+                    <img src="./resources/gz_graph_construction.png" alt="GammaZero Belief Graph Construction" class="visible-image" style="width: 100%; background-color: white;">
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Architecture specifics:</b> 3 hidden layers GNN, PUCT exploration with c=50, progressive widening.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>GammaZero uses a GNN with 3 hidden layers. During online planning, we use PUCT exploration with c=50 for action selection within MCTS, with progressive widening parameters k_a=2.0, α_a=0.9 for actions. The network outputs both a value estimate V_θ and action probabilities P_θ.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Evaluation domains:</b> LightDark, RockSample, MultiObjectSearch, and Rearrangement.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p><b>LightDark:</b> 1D localization with noisy observations improving near "light" region. <b>RockSample(n,k):</b> Information gathering on n×n grid with k rocks of unknown quality. <b>MultiObjectSearch(n,k):</b> Target localization finding k hidden objects on n×n grid. <b>Rearrangement(n,k):</b> Mobile manipulation transporting k objects with unknown positions to goal locations.</p>
+                </div>
+            </div>
+            <hr>
+        </div>
+
+        <div class="section-container">
+            <h2 class="title is-2">Why This Matters
+                <a class="section-toggle" data-action="expand">[Expand All]</a>
+            </h2>
+
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>First graph-based approach for POMDP beliefs:</b> Extends GNN generalization capabilities to partial observability.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>While GNNs have proven effective for fully observable planning, their application to probabilistic belief spaces of POMDPs remained unexplored. GammaZero is the first to successfully combine graph-based generalization with belief uncertainty encoding, opening new possibilities for scalable POMDP planning.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Decouples training from deployment scale:</b> Train on tractable problems, deploy on large instances without retraining.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>GammaZero decouples training complexity from deployment scale. We generate expert demonstrations where optimal planning is tractable (small instances), then deploy learned heuristics on problems where such planners would be prohibitively expensive. This one-time training cost amortizes across all future deployments at any scale.</p>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="dropdown-header">
+                    <span class="header-text">
+                        <b>Addresses long-horizon planning under uncertainty:</b> Combines structural learning with principled belief-space search.
+                    </span>
+                    <span class="icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="dropdown-content">
+                    <p>Long-horizon POMDP planning requires both effective uncertainty reasoning and the ability to search deeply. GammaZero addresses both: the graph representation captures belief uncertainty, while learned approximations guide MCTS to focus on promising action sequences. This combination enables effective planning in domains previously intractable for online methods.</p>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{mangannavar2025gammazerolearningguidepomdp,
+      title={GammaZero: Learning To Guide POMDP Belief Space Search With Graph Representations},
+      author={Rajesh Mangannavar and Prasad Tadepalli},
+      year={2025},
+      eprint={2510.14035},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2510.14035},
+}
+</code></pre>
+  </div>
+</section>
+
+
+<script src="./static/js/isInViewport.min.js"></script>
+<script src="./static/js/bulma-carousel.min.js"></script>
+<script src="./static_js/bulma-slider.min.js"></script>
+<script src="./static_js/index.js"></script>
+
+<script>
+$(document).ready(function() {
+    
+    // --- Individual Dropdown Toggle (NEW) ---
+    $('.dropdown-header').click(function() {
+        // Toggle the 'active' class on the header
+        $(this).toggleClass('active'); 
+        
+        // Find the content and slide it
+        var content = $(this).next('.dropdown-content');
+        content.slideToggle(200); 
+        
+        // That's it! CSS handles the icon rotation.
+    });
+
+    // --- Section Toggle (FIXED) ---
+    $('.section-toggle').click(function(e) {
+        e.preventDefault(); // Stop link behavior
+        e.stopPropagation(); // Stop from triggering individual dropdown click
+        
+        // Find the parent .section-container for this specific toggle
+        var section = $(this).closest('.section-container'); 
+        
+        // Find elements *only* within that section
+        var headers = section.find('.dropdown-header');
+        var contents = section.find('.dropdown-content');
+        var action = $(this).data('action');
+
+        if (action === 'expand') {
+            headers.addClass('active');
+            contents.slideDown(200);
+            // headers.find('.icon').text('▼'); // No longer needed, CSS handles icons
+            $(this).text('[Collapse All]');
+            $(this).data('action', 'collapse');
+        } else {
+            headers.removeClass('active');
+            contents.slideUp(200);
+            // headers.find('.icon').text('▶'); // No longer needed, CSS handles icons
+            $(this).text('[Expand All]');
+            $(this).data('action', 'expand');
+        }
+    });
+
+    // --- Global Toggle ---
+    $('#global-toggle').click(function() {
+        var globalAction = $(this).data('action');
+        var allSectionToggles = $('.section-toggle');
+
+        allSectionToggles.each(function() {
+            var currentSectionAction = $(this).data('action');
+            // Click the section toggle only if it's not already in the desired state
+            if (globalAction === 'expand' && currentSectionAction === 'expand') {
+                $(this).click(); // Click to expand
+            } else if (globalAction === 'collapse' && currentSectionAction === 'collapse') {
+                $(this).click(); // Click to collapse
+            }
+        });
+
+        // Update the global button text and state
+        if (globalAction === 'expand') {
+            $(this).text('Collapse All Sections');
+            $(this).data('action', 'collapse');
+        } else {
+            $(this).text('Expand All Sections');
+            $(this).data('action', 'expand');
+        }
+    });
+
+});
+</script>
+
+</body>
+</html>
