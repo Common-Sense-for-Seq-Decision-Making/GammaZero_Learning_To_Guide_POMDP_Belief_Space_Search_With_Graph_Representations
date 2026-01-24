@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GammaZero: Domain Gallery</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            padding: 25px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .gallery-container { max-width: 1100px; width: 100%; }
+        .gallery-title { text-align: center; font-size: 1.3em; font-weight: 700; color: #333; margin-bottom: 4px; }
+        .gallery-subtitle { text-align: center; font-size: 0.85em; color: #777; margin-bottom: 20px; }
+        .gallery-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+        }
+        @media (max-width: 800px) { .gallery-grid { grid-template-columns: 1fr; } }
+        .domain-card {
+            background: white; border-radius: 12px; padding: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex; flex-direction: column;
+        }
+        .domain-header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+        }
+        .domain-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1em; font-weight: 700; color: white;
+        }
+        .domain-name { font-size: 1em; font-weight: 700; color: #333; }
+        .domain-desc { font-size: 0.78em; color: #666; line-height: 1.4; margin-bottom: 10px; }
+        .domain-content { display: flex; gap: 10px; align-items: flex-start; flex: 1; }
+        .domain-state { flex-shrink: 0; }
+        .domain-graph { flex: 1; }
+        .domain-arrow { font-size: 1.2em; color: #ccc; align-self: center; flex-shrink: 0; }
+        .domain-stats {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+            padding-top: 8px; border-top: 1px solid #f0f0f0;
+        }
+        .domain-stat {
+            font-size: 0.68em; padding: 2px 8px; border-radius: 10px;
+            background: #f5f5f5; color: #555; font-weight: 600;
+        }
+        .domain-stat.highlight { background: #e8f5e9; color: #2e7d32; }
+        .gallery-footer {
+            text-align: center; margin-top: 16px; font-size: 0.82em; color: #666;
+            padding: 12px 20px; background: white; border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .gallery-footer strong { color: #5b6abf; }
+    </style>
+</head>
+<body>
+<div class="gallery-container">
+    <div class="gallery-title">Four Domains, One Graph Architecture</div>
+    <p class="gallery-subtitle">The same 4-node-type graph structure (Object, Attribute, Action, Global) handles all domains. Only the domain-specific construction rules change.</p>
+
+    <div class="gallery-grid">
+        <!-- DOMAIN 1: LightDark -->
+        <div class="domain-card">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:linear-gradient(135deg,#1a237e,#ffd54f);">LD</div>
+                <div class="domain-name">LightDark</div>
+            </div>
+            <div class="domain-desc">1D localization: navigate to goal under position uncertainty. Observations improve near the "light" region. Must gather information before committing.</div>
+            <div class="domain-content">
+                <div class="domain-state">
+                    <svg width="140" height="100" viewBox="0 0 160 100">
+                        <!-- 1D line with light region -->
+                        <defs>
+                            <linearGradient id="light-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#1a237e;stop-opacity:0.8"/>
+                                <stop offset="40%" style="stop-color:#1a237e;stop-opacity:0.5"/>
+                                <stop offset="60%" style="stop-color:#ffd54f;stop-opacity:0.3"/>
+                                <stop offset="80%" style="stop-color:#ffd54f;stop-opacity:0.6"/>
+                                <stop offset="100%" style="stop-color:#1a237e;stop-opacity:0.3"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="10" y="35" width="140" height="30" rx="3" fill="url(#light-grad)"/>
+                        <text x="115" y="55" text-anchor="middle" font-size="7" fill="#5d4037" font-weight="600">LIGHT</text>
+                        <text x="35" y="55" text-anchor="middle" font-size="7" fill="white" font-weight="600">DARK</text>
+
+                        <!-- Belief distribution (Gaussian-like) -->
+                        <path d="M 30,33 Q 40,15 50,33 Q 60,15 70,33" fill="none" stroke="#e53935" stroke-width="1.5" opacity="0.7"/>
+                        <text x="50" y="12" text-anchor="middle" font-size="6.5" fill="#e53935">belief</text>
+
+                        <!-- Goal -->
+                        <circle cx="80" cy="50" r="4" fill="none" stroke="#2e7d32" stroke-width="2"/>
+                        <text x="80" y="76" text-anchor="middle" font-size="6.5" fill="#2e7d32">goal</text>
+
+                        <!-- Robot estimate -->
+                        <circle cx="50" cy="50" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/>
+                        <text x="50" y="92" text-anchor="middle" font-size="6.5" fill="#1565c0">robot?</text>
+                    </svg>
+                </div>
+                <div class="domain-arrow">&#8594;</div>
+                <div class="domain-graph">
+                    <svg width="100%" viewBox="0 0 220 100">
+                        <!-- Simplified graph -->
+                        <line x1="55" y1="20" x2="55" y2="50" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="120" y1="20" x2="100" y2="50" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="55" y1="60" x2="55" y2="80" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.5"/>
+                        <line x1="100" y1="60" x2="120" y2="80" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.7"/>
+                        <line x1="170" y1="55" x2="55" y2="55" stroke="#999" stroke-width="0.6" opacity="0.2"/>
+                        <line x1="170" y1="55" x2="100" y2="55" stroke="#999" stroke-width="0.6" opacity="0.2"/>
+
+                        <!-- Action nodes -->
+                        <rect x="25" y="6" width="60" height="18" rx="4" fill="#5b6abf" stroke="#3d4a9e" stroke-width="1.5"/>
+                        <text x="55" y="18" text-anchor="middle" font-size="7" fill="white" font-weight="600">MoveLeft</text>
+                        <rect x="95" y="6" width="60" height="18" rx="4" fill="#5b6abf" stroke="#3d4a9e" stroke-width="1.5"/>
+                        <text x="125" y="18" text-anchor="middle" font-size="7" fill="white" font-weight="600">MoveRight</text>
+
+                        <!-- Object node -->
+                        <circle cx="55" cy="55" r="12" fill="#bbdefb" stroke="#1565c0" stroke-width="1.5"/>
+                        <text x="55" y="58" text-anchor="middle" font-size="7" font-weight="700" fill="#1565c0">Bot</text>
+                        <circle cx="100" cy="55" r="10" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.5"/>
+                        <text x="100" y="58" text-anchor="middle" font-size="6" font-weight="700" fill="#2e7d32">Goal</text>
+
+                        <!-- Attribute nodes -->
+                        <rect x="20" y="76" width="70" height="16" rx="8" fill="#ff9800" opacity="0.5" stroke="#e65100" stroke-width="1"/>
+                        <text x="55" y="87" text-anchor="middle" font-size="6" fill="white" font-weight="600">At(Bot) ~3.2</text>
+                        <rect x="95" y="76" width="65" height="16" rx="8" fill="#ff9800" opacity="0.8" stroke="#e65100" stroke-width="1"/>
+                        <text x="127" y="87" text-anchor="middle" font-size="6" fill="white" font-weight="600">AtGoal 0.0</text>
+
+                        <!-- Global -->
+                        <polygon points="170,45 180,55 170,65 160,55" fill="#78909c" stroke="#455a64" stroke-width="1.5"/>
+                        <text x="170" y="58" text-anchor="middle" font-size="5.5" fill="white" font-weight="700">G</text>
+                    </svg>
+                </div>
+            </div>
+            <div class="domain-stats">
+                <div class="domain-stat">Train: LD(5)</div>
+                <div class="domain-stat">Test: LD(10)</div>
+                <div class="domain-stat highlight">2x generalization</div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 2: RockSample -->
+        <div class="domain-card">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:linear-gradient(135deg,#2e7d32,#81c784);">RS</div>
+                <div class="domain-name">RockSample(n,k)</div>
+            </div>
+            <div class="domain-desc">Information gathering on n×n grid with k rocks of unknown quality. Distance-dependent noisy sensor. Check rocks, then sample good ones and exit.</div>
+            <div class="domain-content">
+                <div class="domain-state">
+                    <svg width="110" height="100" viewBox="0 0 120 110">
+                        <rect x="5" y="5" width="100" height="100" fill="#f5f5f5" stroke="#bbb" rx="3"/>
+                        <!-- Grid lines -->
+                        <line x1="25" y1="5" x2="25" y2="105" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="45" y1="5" x2="45" y2="105" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="65" y1="5" x2="65" y2="105" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="85" y1="5" x2="85" y2="105" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="5" y1="25" x2="105" y2="25" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="5" y1="45" x2="105" y2="45" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="5" y1="65" x2="105" y2="65" stroke="#ddd" stroke-width="0.5"/>
+                        <line x1="5" y1="85" x2="105" y2="85" stroke="#ddd" stroke-width="0.5"/>
+                        <!-- Exit -->
+                        <rect x="97" y="5" width="8" height="100" fill="#e8f5e9" opacity="0.6"/>
+                        <!-- Rocks -->
+                        <polygon points="35,35 40,25 45,35" fill="#81c784" stroke="#388e3c" stroke-width="1" opacity="0.8"/>
+                        <polygon points="75,55 80,45 85,55" fill="#9e9e9e" stroke="#666" stroke-width="1" opacity="0.5"/>
+                        <polygon points="55,85 60,75 65,85" fill="#4caf50" stroke="#2e7d32" stroke-width="1"/>
+                        <!-- Robot -->
+                        <circle cx="15" cy="55" r="7" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/>
+                        <text x="15" y="58" text-anchor="middle" font-size="6" fill="white" font-weight="700">R</text>
+                        <!-- Sensor beam -->
+                        <line x1="22" y1="55" x2="70" y2="50" stroke="#ffeb3b" stroke-width="1" stroke-dasharray="2,2" opacity="0.6"/>
+                    </svg>
+                </div>
+                <div class="domain-arrow">&#8594;</div>
+                <div class="domain-graph">
+                    <svg width="100%" viewBox="0 0 220 100">
+                        <!-- Edges -->
+                        <line x1="40" y1="20" x2="40" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="90" y1="20" x2="85" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="140" y1="20" x2="130" y2="42" stroke="#5b6abf" stroke-width="2" opacity="0.7"/>
+                        <line x1="40" y1="62" x2="40" y2="78" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+                        <line x1="85" y1="62" x2="90" y2="78" stroke="#ff9800" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.7"/>
+                        <line x1="130" y1="62" x2="140" y2="78" stroke="#ff9800" stroke-width="1.8" stroke-dasharray="3,2" opacity="0.9"/>
+                        <line x1="190" y1="52" x2="40" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                        <line x1="190" y1="52" x2="85" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                        <line x1="190" y1="52" x2="130" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+
+                        <!-- Actions -->
+                        <rect x="15" y="5" width="50" height="16" rx="3" fill="#5b6abf"/><text x="40" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Check(R1)</text>
+                        <rect x="70" y="5" width="50" height="16" rx="3" fill="#5b6abf"/><text x="95" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Sample(R3)</text>
+                        <rect x="125" y="5" width="38" height="16" rx="3" fill="#5b6abf"/><text x="144" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">MoveE</text>
+
+                        <!-- Objects -->
+                        <circle cx="40" cy="52" r="10" fill="#e8e8e8" stroke="#666" stroke-width="1.5"/><text x="40" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#555">R1</text>
+                        <circle cx="85" cy="52" r="10" fill="#c8e6c9" stroke="#388e3c" stroke-width="1.5"/><text x="85" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#2e7d32">R3</text>
+                        <circle cx="130" cy="52" r="10" fill="#bbdefb" stroke="#1565c0" stroke-width="1.5"/><text x="130" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#1565c0">Bot</text>
+
+                        <!-- Attributes -->
+                        <rect x="10" y="78" width="60" height="14" rx="7" fill="#ff9800" opacity="0.4"/><text x="40" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">Good(R1) 0.40</text>
+                        <rect x="75" y="78" width="60" height="14" rx="7" fill="#ff9800" opacity="0.9"/><text x="105" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">Good(R3) 0.90</text>
+                        <rect x="140" y="78" width="55" height="14" rx="7" fill="#ff9800" opacity="1.0"/><text x="167" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(B) 1.0</text>
+
+                        <!-- Global -->
+                        <polygon points="190,42 200,52 190,62 180,52" fill="#78909c" stroke="#455a64" stroke-width="1.5"/>
+                        <text x="190" y="55" text-anchor="middle" font-size="5" fill="white" font-weight="700">G</text>
+                    </svg>
+                </div>
+            </div>
+            <div class="domain-stats">
+                <div class="domain-stat">Train: RS(5,5)-(10,10)</div>
+                <div class="domain-stat">Test: RS(25,25)</div>
+                <div class="domain-stat highlight">6.25x area</div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 3: MultiObjectSearch -->
+        <div class="domain-card">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:linear-gradient(135deg,#e65100,#ff9800);">MOS</div>
+                <div class="domain-name">MultiObjectSearch(n,k)</div>
+            </div>
+            <div class="domain-desc">Find and declare k hidden objects on n×n grid using range-limited sensor. Robot must navigate, scan for objects, then declare locations with confidence.</div>
+            <div class="domain-content">
+                <div class="domain-state">
+                    <svg width="110" height="100" viewBox="0 0 120 110">
+                        <rect x="5" y="5" width="100" height="100" fill="#fff8e1" stroke="#ffb300" rx="3"/>
+                        <line x1="30" y1="5" x2="30" y2="105" stroke="#ffe082" stroke-width="0.5"/>
+                        <line x1="55" y1="5" x2="55" y2="105" stroke="#ffe082" stroke-width="0.5"/>
+                        <line x1="80" y1="5" x2="80" y2="105" stroke="#ffe082" stroke-width="0.5"/>
+                        <line x1="5" y1="30" x2="105" y2="30" stroke="#ffe082" stroke-width="0.5"/>
+                        <line x1="5" y1="55" x2="105" y2="55" stroke="#ffe082" stroke-width="0.5"/>
+                        <line x1="5" y1="80" x2="105" y2="80" stroke="#ffe082" stroke-width="0.5"/>
+                        <!-- Hidden objects (dashed) -->
+                        <rect x="60" y="60" width="15" height="15" rx="2" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <text x="67" y="71" text-anchor="middle" font-size="6" fill="#e65100" font-weight="700">T1</text>
+                        <rect x="32" y="32" width="15" height="15" rx="2" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <text x="40" y="43" text-anchor="middle" font-size="6" fill="#e65100" font-weight="700">T2</text>
+                        <rect x="80" y="15" width="15" height="15" rx="2" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <text x="87" y="26" text-anchor="middle" font-size="6" fill="#e65100" font-weight="700">T3</text>
+                        <!-- Sensor range -->
+                        <circle cx="42" cy="75" r="20" fill="#42a5f5" opacity="0.1" stroke="#42a5f5" stroke-width="0.8" stroke-dasharray="2,2"/>
+                        <!-- Robot -->
+                        <circle cx="42" cy="75" r="7" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/>
+                        <text x="42" y="78" text-anchor="middle" font-size="6" fill="white" font-weight="700">R</text>
+                        <text x="42" y="100" text-anchor="middle" font-size="5.5" fill="#1565c0">sensor range</text>
+                    </svg>
+                </div>
+                <div class="domain-arrow">&#8594;</div>
+                <div class="domain-graph">
+                    <svg width="100%" viewBox="0 0 220 100">
+                        <line x1="35" y1="20" x2="50" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="95" y1="20" x2="95" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="155" y1="20" x2="140" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="50" y1="62" x2="35" y2="78" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.5"/>
+                        <line x1="95" y1="62" x2="90" y2="78" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+                        <line x1="140" y1="62" x2="145" y2="78" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.3"/>
+
+                        <!-- Actions -->
+                        <rect x="10" y="5" width="50" height="16" rx="3" fill="#5b6abf"/><text x="35" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Look</text>
+                        <rect x="70" y="5" width="50" height="16" rx="3" fill="#5b6abf"/><text x="95" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Declare(T1)</text>
+                        <rect x="130" y="5" width="50" height="16" rx="3" fill="#5b6abf"/><text x="155" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Move</text>
+
+                        <!-- Objects -->
+                        <circle cx="50" cy="52" r="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/><text x="50" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#e65100">T1</text>
+                        <circle cx="95" cy="52" r="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/><text x="95" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#e65100">T2</text>
+                        <circle cx="140" cy="52" r="10" fill="#bbdefb" stroke="#1565c0" stroke-width="1.5"/><text x="140" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#1565c0">Bot</text>
+
+                        <!-- Attributes -->
+                        <rect x="5" y="78" width="60" height="14" rx="7" fill="#ff9800" opacity="0.55"/><text x="35" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(T1)? 0.55</text>
+                        <rect x="70" y="78" width="55" height="14" rx="7" fill="#ff9800" opacity="0.35"/><text x="97" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(T2)? 0.3</text>
+                        <rect x="130" y="78" width="55" height="14" rx="7" fill="#ff9800" opacity="1.0"/><text x="157" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(B) 1.0</text>
+
+                        <polygon points="200,42 210,52 200,62 190,52" fill="#78909c" stroke="#455a64" stroke-width="1.5"/>
+                        <text x="200" y="55" text-anchor="middle" font-size="5" fill="white" font-weight="700">G</text>
+                        <line x1="200" y1="52" x2="50" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                        <line x1="200" y1="52" x2="95" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                        <line x1="200" y1="52" x2="140" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="domain-stats">
+                <div class="domain-stat">Train: MOS(3,2)-(4,3)</div>
+                <div class="domain-stat">Test: MOS(8,6)</div>
+                <div class="domain-stat highlight">4x area, 2x objects</div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 4: Rearrangement -->
+        <div class="domain-card">
+            <div class="domain-header">
+                <div class="domain-icon" style="background:linear-gradient(135deg,#5b6abf,#9c27b0);">RG</div>
+                <div class="domain-name">Rearrangement(n,k)</div>
+            </div>
+            <div class="domain-desc">Mobile manipulation: locate k objects with unknown positions, then transport them to goal locations on n×n grid. Combines perceptual uncertainty with multi-step planning.</div>
+            <div class="domain-content">
+                <div class="domain-state">
+                    <svg width="110" height="100" viewBox="0 0 120 110">
+                        <rect x="5" y="5" width="100" height="100" fill="#f3e5f5" stroke="#9c27b0" rx="3" opacity="0.3"/>
+                        <line x1="30" y1="5" x2="30" y2="105" stroke="#ce93d8" stroke-width="0.5"/>
+                        <line x1="55" y1="5" x2="55" y2="105" stroke="#ce93d8" stroke-width="0.5"/>
+                        <line x1="80" y1="5" x2="80" y2="105" stroke="#ce93d8" stroke-width="0.5"/>
+                        <line x1="5" y1="30" x2="105" y2="30" stroke="#ce93d8" stroke-width="0.5"/>
+                        <line x1="5" y1="55" x2="105" y2="55" stroke="#ce93d8" stroke-width="0.5"/>
+                        <line x1="5" y1="80" x2="105" y2="80" stroke="#ce93d8" stroke-width="0.5"/>
+                        <!-- Goal positions (X marks) -->
+                        <text x="88" y="23" text-anchor="middle" font-size="12" fill="#2e7d32" font-weight="700" opacity="0.5">X</text>
+                        <text x="63" y="73" text-anchor="middle" font-size="12" fill="#2e7d32" font-weight="700" opacity="0.5">X</text>
+                        <text x="88" y="98" text-anchor="middle" font-size="5" fill="#2e7d32">goals</text>
+                        <!-- Objects (uncertain positions shown with ?) -->
+                        <rect x="15" y="35" width="12" height="12" rx="2" fill="#ff9800" stroke="#e65100" stroke-width="1.5"/>
+                        <text x="21" y="44" text-anchor="middle" font-size="5" fill="white" font-weight="700">P1</text>
+                        <rect x="60" y="10" width="12" height="12" rx="2" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.5" stroke-dasharray="2,2"/>
+                        <text x="66" y="19" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">P2?</text>
+                        <!-- Robot -->
+                        <circle cx="42" cy="42" r="7" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/>
+                        <text x="42" y="45" text-anchor="middle" font-size="6" fill="white" font-weight="700">R</text>
+                        <!-- Arrow from object to goal -->
+                        <path d="M 21,48 Q 50,80 60,68" fill="none" stroke="#2e7d32" stroke-width="1" stroke-dasharray="3,2" opacity="0.5" marker-end="url(#arr)"/>
+                    </svg>
+                </div>
+                <div class="domain-arrow">&#8594;</div>
+                <div class="domain-graph">
+                    <svg width="100%" viewBox="0 0 220 100">
+                        <line x1="40" y1="20" x2="45" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="100" y1="20" x2="95" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="160" y1="20" x2="145" y2="42" stroke="#5b6abf" stroke-width="1.5" opacity="0.6"/>
+                        <line x1="45" y1="62" x2="35" y2="78" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.7"/>
+                        <line x1="95" y1="62" x2="90" y2="78" stroke="#ff9800" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.4"/>
+                        <line x1="145" y1="62" x2="145" y2="78" stroke="#ff9800" stroke-width="1.8" stroke-dasharray="3,2" opacity="1.0"/>
+
+                        <!-- Actions -->
+                        <rect x="10" y="5" width="55" height="16" rx="3" fill="#5b6abf"/><text x="37" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Pick(P1)</text>
+                        <rect x="72" y="5" width="55" height="16" rx="3" fill="#5b6abf"/><text x="99" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Look</text>
+                        <rect x="133" y="5" width="55" height="16" rx="3" fill="#5b6abf"/><text x="160" y="16" text-anchor="middle" font-size="6" fill="white" font-weight="600">Move</text>
+
+                        <!-- Objects -->
+                        <circle cx="45" cy="52" r="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/><text x="45" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#e65100">P1</text>
+                        <circle cx="95" cy="52" r="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.5" opacity="0.5"/><text x="95" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#e65100">P2</text>
+                        <circle cx="145" cy="52" r="10" fill="#bbdefb" stroke="#1565c0" stroke-width="1.5"/><text x="145" y="55" text-anchor="middle" font-size="6" font-weight="700" fill="#1565c0">Bot</text>
+
+                        <!-- Attributes -->
+                        <rect x="5" y="78" width="60" height="14" rx="7" fill="#ff9800" opacity="0.7"/><text x="35" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(P1) 0.70</text>
+                        <rect x="70" y="78" width="55" height="14" rx="7" fill="#ff9800" opacity="0.35"/><text x="97" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(P2)? 0.3</text>
+                        <rect x="130" y="78" width="55" height="14" rx="7" fill="#ff9800" opacity="1.0"/><text x="157" y="88" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">At(B) 1.0</text>
+
+                        <polygon points="200,42 210,52 200,62 190,52" fill="#78909c" stroke="#455a64" stroke-width="1.5"/>
+                        <text x="200" y="55" text-anchor="middle" font-size="5" fill="white" font-weight="700">G</text>
+                        <line x1="200" y1="52" x2="45" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                        <line x1="200" y1="52" x2="95" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                        <line x1="200" y1="52" x2="145" y2="52" stroke="#999" stroke-width="0.5" opacity="0.15"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="domain-stats">
+                <div class="domain-stat">Train: RG(3,2)-(4,3)</div>
+                <div class="domain-stat">Test: RG(8,5)</div>
+                <div class="domain-stat highlight">4x area, 2.5x objects</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="gallery-footer">
+        <strong>Key Pattern:</strong> Each domain maps to the same 4-node-type structure:
+        <span style="color:#5b6abf;font-weight:600;">Actions</span> (blue) connect to
+        <span style="color:#e65100;font-weight:600;">Objects</span> (circles), which connect to
+        <span style="color:#ff9800;font-weight:600;">Attributes</span> (orange, opacity = belief) via
+        <span style="color:#78909c;font-weight:600;">Global</span> (diamond).
+        Adding more objects just adds more nodes — the same GNN weights process all sizes.
+    </div>
+</div>
+</body>
+</html>

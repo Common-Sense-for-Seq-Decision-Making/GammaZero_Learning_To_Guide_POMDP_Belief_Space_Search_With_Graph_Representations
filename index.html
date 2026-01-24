@@ -211,6 +211,85 @@
     .header-gabar { background-color: #ccffcc !important; } /* Light Green */
     .header-ablations { background-color: #cceeff !important; } /* Light Blue */
 
+    /* --- Interactive Graph Construction Styles --- */
+    .gz-interactive-container { max-width: 1000px; width: 100%; margin: 20px auto; }
+    .gz-interactive-title { text-align: center; color: #333; margin-bottom: 4px; font-size: 1.2em; font-weight: 700; }
+    .gz-interactive-subtitle { text-align: center; color: #777; font-size: 0.85em; margin-bottom: 14px; }
+    .gz-layout { display: flex; gap: 12px; align-items: stretch; justify-content: center; flex-wrap: wrap; }
+    .gz-belief-panel {
+        background: #fafafa; border-radius: 10px; padding: 14px 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        display: flex; flex-direction: column; align-items: center;
+        width: 200px; flex-shrink: 0;
+    }
+    .gz-belief-panel h4 { font-size: 0.7em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .gz-graph-panel {
+        background: #fafafa; border-radius: 10px; padding: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06); flex: 1; min-width: 500px;
+    }
+    .gz-graph-panel h4 { font-size: 0.7em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; text-align: center; }
+    .gz-arrow { font-size: 1.5em; color: #ccc; align-self: center; padding: 0 4px; }
+    .gz-grid-cell { cursor: pointer; transition: opacity 0.2s, filter 0.2s; }
+    .gz-node { cursor: pointer; }
+    .gz-node circle, .gz-node rect, .gz-node polygon { transition: stroke-width 0.2s, filter 0.2s, opacity 0.3s; }
+    .gz-edge { transition: stroke-width 0.3s, opacity 0.3s; }
+    .gz-dimmed { opacity: 0.1 !important; }
+    .gz-highlighted circle, .gz-highlighted rect, .gz-highlighted polygon { stroke-width: 3.5px !important; filter: drop-shadow(0 0 5px rgba(0,0,0,0.3)); }
+    .gz-highlighted-cell rect { stroke-width: 3px !important; filter: drop-shadow(0 0 4px rgba(0,0,0,0.25)); }
+    .gz-edge.gz-highlighted { stroke-width: 3.5px !important; opacity: 1 !important; }
+    .gz-tooltip {
+        position: fixed; background: #333; color: white;
+        padding: 8px 14px; border-radius: 6px; font-size: 0.8em;
+        pointer-events: none; opacity: 0; transition: opacity 0.15s;
+        z-index: 1000; max-width: 280px; line-height: 1.4;
+    }
+    .gz-tooltip.visible { opacity: 1; }
+    .gz-legend { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 8px; gap: 4px 12px; }
+    .gz-legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.7em; color: #666; }
+    .gz-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .gz-legend-line { width: 14px; height: 3px; border-radius: 2px; }
+    .gz-instructions { text-align: center; color: #999; font-size: 0.75em; margin-top: 8px; font-style: italic; }
+    .gz-belief-bar { display: flex; align-items: center; gap: 5px; margin: 2px 0; font-size: 0.72em; color: #555; width: 100%; }
+    .gz-belief-bar-label { width: 65px; text-align: right; font-weight: 600; font-size: 0.82em; }
+    .gz-belief-bar-track { flex: 1; height: 9px; background: #eee; border-radius: 5px; overflow: hidden; }
+    .gz-belief-bar-fill { height: 100%; border-radius: 5px; }
+    .gz-belief-bar-val { width: 28px; font-size: 0.82em; font-weight: 600; }
+    .gz-threshold-line { border-top: 2px dashed #e74c3c; margin: 6px 0 3px; width: 100%; }
+    .gz-threshold-label { font-size: 0.62em; color: #e74c3c; text-align: center; font-weight: 600; }
+    .gz-tau-note { font-size: 0.65em; color: #999; margin-top: 2px; text-align: center; }
+    @media (max-width: 768px) {
+        .gz-layout { flex-direction: column; align-items: center; }
+        .gz-belief-panel { width: 100%; max-width: 300px; }
+        .gz-graph-panel { min-width: unset; width: 100%; }
+        .gz-arrow { transform: rotate(90deg); }
+    }
+
+    /* MCTS Comparison Styles */
+    .mcts-embed { display: flex; gap: 14px; margin: 20px 0; flex-wrap: wrap; justify-content: center; }
+    .mcts-embed-panel {
+        background: #fafafa; border-radius: 10px; padding: 14px; flex: 1; min-width: 380px; max-width: 480px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+    .mcts-embed-panel h4 { text-align: center; font-size: 0.8em; font-weight: 700; margin-bottom: 8px; padding: 4px 10px; border-radius: 4px; }
+    .mcts-embed-panel.baseline h4 { background: #ffebee; color: #c62828; }
+    .mcts-embed-panel.guided h4 { background: #e8f5e9; color: #2e7d32; }
+    .mcts-embed-caption { text-align: center; font-size: 0.78em; color: #666; margin-top: 10px; padding: 8px 14px; background: #f8f9ff; border-radius: 5px; border: 1px solid #eee; }
+    @media (max-width: 850px) { .mcts-embed { flex-direction: column; align-items: center; } .mcts-embed-panel { min-width: unset; width: 100%; } }
+
+    /* Domain Gallery Styles */
+    .domain-gallery-embed { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    @media (max-width: 700px) { .domain-gallery-embed { grid-template-columns: 1fr; } }
+    .domain-card-embed {
+        background: #fafafa; border-radius: 8px; padding: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .domain-card-embed .domain-header-e { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .domain-card-embed .domain-icon-e { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7em; font-weight: 700; color: white; }
+    .domain-card-embed .domain-name-e { font-size: 0.85em; font-weight: 700; color: #333; }
+    .domain-card-embed .domain-desc-e { font-size: 0.72em; color: #666; line-height: 1.3; margin-bottom: 6px; }
+    .domain-card-embed .domain-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .domain-card-embed .domain-tag { font-size: 0.62em; padding: 2px 6px; border-radius: 8px; background: #f0f0f0; color: #555; font-weight: 600; }
+    .domain-card-embed .domain-tag.hl { background: #e8f5e9; color: #2e7d32; }
 
   </style>
 </head>
@@ -438,7 +517,94 @@
                 </div>
             </div>
 
-            <img src="./resources/gz_graph_construction.png" alt="GammaZero Belief Graph Construction" class="visible-image" style="width: 100%; background-color: white;">
+            <!-- Interactive Graph Construction Component -->
+            <div class="gz-interactive-container">
+                <div class="gz-interactive-title">How GammaZero Converts a Belief State to a Graph</div>
+                <p class="gz-interactive-subtitle">RockSample(5,3): Hover over grid cells or graph nodes to see belief-driven connections</p>
+                <div class="gz-layout">
+                    <!-- LEFT: Belief State Panel -->
+                    <div class="gz-belief-panel">
+                        <h4>Belief State</h4>
+                        <svg id="gz-grid-svg" width="180" height="180" viewBox="0 0 190 190">
+                            <defs><pattern id="grid-pat" width="36" height="36" patternUnits="userSpaceOnUse"><rect width="36" height="36" fill="none" stroke="#ddd" stroke-width="0.5"/></pattern></defs>
+                            <rect x="5" y="5" width="180" height="180" fill="url(#grid-pat)" stroke="#bbb" stroke-width="1" rx="3"/>
+                            <rect x="169" y="5" width="16" height="180" fill="#e8f5e9" opacity="0.5" rx="2"/>
+                            <text x="177" y="98" font-size="7" fill="#2e7d32" text-anchor="middle" transform="rotate(-90, 177, 98)">EXIT</text>
+                            <g class="gz-grid-cell" data-hover="rock-R1"><rect x="42" y="77" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/><polygon points="59,82 67,96 51,96" fill="#9e9e9e" stroke="#616161" stroke-width="1.5" opacity="0.6"/><text x="59" y="108" text-anchor="middle" font-size="7.5" font-weight="700" fill="#555">R1</text><text x="59" y="116" text-anchor="middle" font-size="6" fill="#e74c3c">?</text></g>
+                            <g class="gz-grid-cell" data-hover="rock-R2"><rect x="114" y="41" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/><polygon points="131,46 139,60 123,60" fill="#81c784" stroke="#388e3c" stroke-width="1.5" opacity="0.85"/><text x="131" y="72" text-anchor="middle" font-size="7.5" font-weight="700" fill="#555">R2</text><text x="131" y="80" text-anchor="middle" font-size="6" fill="#388e3c">75%</text></g>
+                            <g class="gz-grid-cell" data-hover="rock-R3"><rect x="78" y="113" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/><polygon points="95,118 103,132 87,132" fill="#4caf50" stroke="#2e7d32" stroke-width="1.5" opacity="0.95"/><text x="95" y="144" text-anchor="middle" font-size="7.5" font-weight="700" fill="#555">R3</text><text x="95" y="152" text-anchor="middle" font-size="6" fill="#2e7d32">90%</text></g>
+                            <g class="gz-grid-cell" data-hover="robot"><rect x="6" y="77" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/><circle cx="23" cy="94" r="12" fill="#42a5f5" stroke="#1565c0" stroke-width="2"/><text x="23" y="98" text-anchor="middle" font-size="8" font-weight="700" fill="white">R</text></g>
+                        </svg>
+                        <h4 style="margin-top:8px;">Belief Probabilities</h4>
+                        <div style="width:100%;padding:0 4px;">
+                            <div class="gz-belief-bar"><span class="gz-belief-bar-label">At(Robot)</span><div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:100%;background:#42a5f5;"></div></div><span class="gz-belief-bar-val">1.0</span></div>
+                            <div class="gz-belief-bar"><span class="gz-belief-bar-label">IsGood(R3)</span><div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:90%;background:#4caf50;"></div></div><span class="gz-belief-bar-val">0.90</span></div>
+                            <div class="gz-belief-bar"><span class="gz-belief-bar-label">IsGood(R2)</span><div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:75%;background:#81c784;"></div></div><span class="gz-belief-bar-val">0.75</span></div>
+                            <div class="gz-threshold-line"></div>
+                            <div class="gz-threshold-label">threshold &#964; = 0.3</div>
+                            <div class="gz-belief-bar"><span class="gz-belief-bar-label">IsGood(R1)</span><div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:40%;background:#9e9e9e;"></div></div><span class="gz-belief-bar-val">0.40</span></div>
+                            <div class="gz-belief-bar"><span class="gz-belief-bar-label">IsBad(R1)</span><div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:60%;background:#ef9a9a;"></div></div><span class="gz-belief-bar-val">0.60</span></div>
+                        </div>
+                        <p class="gz-tau-note">Attributes above &#964; become graph nodes</p>
+                    </div>
+                    <div class="gz-arrow">&#8594;</div>
+                    <!-- RIGHT: Graph Panel -->
+                    <div class="gz-graph-panel">
+                        <h4>Uncertainty-Aware Belief Graph</h4>
+                        <svg id="gz-graph-svg" width="100%" viewBox="0 0 620 340" style="max-height:320px;">
+                            <!-- Edges -->
+                            <line class="gz-edge" data-edge="action-obj" data-connects="check_R1 R1" x1="105" y1="55" x2="155" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                            <line class="gz-edge" data-edge="action-obj" data-connects="check_R2 R2" x1="235" y1="55" x2="275" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                            <line class="gz-edge" data-edge="action-obj" data-connects="sample_R3 R3" x1="365" y1="55" x2="395" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                            <line class="gz-edge" data-edge="action-obj" data-connects="move_east robot" x1="500" y1="55" x2="515" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                            <line class="gz-edge" data-edge="attr-obj" data-connects="isgood_R1 R1" x1="90" y1="250" x2="155" y2="170" stroke="#ff9800" stroke-width="1.8" opacity="0.45" stroke-dasharray="4,3"/>
+                            <line class="gz-edge" data-edge="attr-obj" data-connects="isbad_R1 R1" x1="200" y1="250" x2="155" y2="170" stroke="#ff9800" stroke-width="1.8" opacity="0.55" stroke-dasharray="4,3"/>
+                            <line class="gz-edge" data-edge="attr-obj" data-connects="isgood_R2 R2" x1="320" y1="250" x2="275" y2="170" stroke="#ff9800" stroke-width="2.2" opacity="0.7" stroke-dasharray="4,3"/>
+                            <line class="gz-edge" data-edge="attr-obj" data-connects="isgood_R3 R3" x1="440" y1="250" x2="395" y2="170" stroke="#ff9800" stroke-width="2.5" opacity="0.85" stroke-dasharray="4,3"/>
+                            <line class="gz-edge" data-edge="attr-obj" data-connects="at_robot robot" x1="560" y1="250" x2="515" y2="170" stroke="#ff9800" stroke-width="2.8" opacity="0.95" stroke-dasharray="4,3"/>
+                            <line class="gz-edge" data-edge="attr-act" data-connects="isgood_R1 check_R1" x1="90" y1="240" x2="105" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                            <line class="gz-edge" data-edge="attr-act" data-connects="isgood_R2 check_R2" x1="320" y1="240" x2="235" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                            <line class="gz-edge" data-edge="attr-act" data-connects="isgood_R3 sample_R3" x1="440" y1="240" x2="365" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                            <line class="gz-edge" data-edge="attr-act" data-connects="at_robot move_east" x1="560" y1="240" x2="500" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                            <line class="gz-edge" data-edge="global" data-connects="global R1" x1="330" y1="320" x2="155" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                            <line class="gz-edge" data-edge="global" data-connects="global R2" x1="330" y1="320" x2="275" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                            <line class="gz-edge" data-edge="global" data-connects="global R3" x1="330" y1="320" x2="395" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                            <line class="gz-edge" data-edge="global" data-connects="global robot" x1="330" y1="320" x2="515" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                            <!-- Action Nodes -->
+                            <g class="gz-node" data-ntype="action" data-id="check_R1" data-tip="Check(R1): Observe rock R1's quality with distance-dependent accuracy. Connected to R1 and IsGood(R1)."><rect x="50" y="25" width="110" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/><text x="105" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">Check(R1)</text></g>
+                            <g class="gz-node" data-ntype="action" data-id="check_R2" data-tip="Check(R2): Observe rock R2's quality. Connected to R2 and IsGood(R2)."><rect x="180" y="25" width="110" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/><text x="235" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">Check(R2)</text></g>
+                            <g class="gz-node" data-ntype="action" data-id="sample_R3" data-tip="Sample(R3): Collect rock R3. Reward depends on IsGood(R3) belief (0.90). Connected to R3."><rect x="310" y="25" width="110" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/><text x="365" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">Sample(R3)</text></g>
+                            <g class="gz-node" data-ntype="action" data-id="move_east" data-tip="MoveEast: Move robot one cell right toward exit. Connected to Robot and At(Robot)."><rect x="440" y="25" width="120" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/><text x="500" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">MoveEast</text></g>
+                            <!-- Object Nodes -->
+                            <g class="gz-node" data-ntype="object" data-id="R1" data-tip="Rock R1: Quality uncertain (40% good, 60% bad). Connected to Check(R1), IsGood(R1), IsBad(R1)."><circle cx="155" cy="150" r="24" fill="#e8e8e8" stroke="#757575" stroke-width="2.5"/><polygon points="155,133 165,147 145,147" fill="#9e9e9e" stroke="#616161" stroke-width="1"/><text x="155" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#555">R1</text></g>
+                            <g class="gz-node" data-ntype="object" data-id="R2" data-tip="Rock R2: Likely good (75% belief). Connected to Check(R2) and IsGood(R2)."><circle cx="275" cy="150" r="24" fill="#c8e6c9" stroke="#388e3c" stroke-width="2.5"/><polygon points="275,133 285,147 265,147" fill="#81c784" stroke="#388e3c" stroke-width="1"/><text x="275" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#2e7d32">R2</text></g>
+                            <g class="gz-node" data-ntype="object" data-id="R3" data-tip="Rock R3: High confidence good (90%). Connected to Sample(R3) and IsGood(R3)."><circle cx="395" cy="150" r="24" fill="#a5d6a7" stroke="#2e7d32" stroke-width="2.5"/><polygon points="395,133 405,147 385,147" fill="#4caf50" stroke="#2e7d32" stroke-width="1"/><text x="395" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#1b5e20">R3</text></g>
+                            <g class="gz-node" data-ntype="object" data-id="robot" data-tip="Robot: Position known with certainty (belief=1.0). Connected to MoveEast and At(Robot)."><circle cx="515" cy="150" r="24" fill="#bbdefb" stroke="#1565c0" stroke-width="2.5"/><text x="515" y="155" text-anchor="middle" font-size="11" font-weight="700" fill="#1565c0">Bot</text></g>
+                            <!-- Attribute Nodes -->
+                            <g class="gz-node" data-ntype="attribute" data-id="isgood_R1" data-tip="IsGood(R1): Belief 0.40. Node exists because 0.40 > tau(0.30). Edge weight encodes uncertainty."><rect x="35" y="230" width="110" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.5"/><text x="90" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsGood(R1) 0.40</text></g>
+                            <g class="gz-node" data-ntype="attribute" data-id="isbad_R1" data-tip="IsBad(R1): Belief 0.60. Complementary to IsGood(R1). Both exist since both > tau."><rect x="155" y="230" width="100" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.65"/><text x="205" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsBad(R1) 0.60</text></g>
+                            <g class="gz-node" data-ntype="attribute" data-id="isgood_R2" data-tip="IsGood(R2): Belief 0.75. Strong particle support. Edge thickness reflects confidence."><rect x="268" y="230" width="110" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.8"/><text x="323" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsGood(R2) 0.75</text></g>
+                            <g class="gz-node" data-ntype="attribute" data-id="isgood_R3" data-tip="IsGood(R3): Belief 0.90. Near-unanimous support. High confidence enables sampling."><rect x="390" y="230" width="108" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.92"/><text x="444" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsGood(R3) 0.90</text></g>
+                            <g class="gz-node" data-ntype="attribute" data-id="at_robot" data-tip="At(Robot)=(0,2): Position known with certainty (1.0). Enables MoveEast."><rect x="510" y="230" width="105" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="1.0"/><text x="562" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">At(Bot) 1.00</text></g>
+                            <!-- Global Node -->
+                            <g class="gz-node" data-ntype="global" data-id="global" data-tip="Global node: Holistic belief representation. Connects to all objects for rapid information propagation."><polygon points="330,300 350,320 330,340 310,320" fill="#78909c" stroke="#455a64" stroke-width="2"/><text x="330" y="324" text-anchor="middle" font-size="8" font-weight="700" fill="white">G</text></g>
+                        </svg>
+                        <div class="gz-legend">
+                            <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#5b6abf;"></div>Action</div>
+                            <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#c8e6c9;border:2px solid #388e3c;"></div>Object</div>
+                            <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#ff9800;border-radius:3px;"></div>Attribute</div>
+                            <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#78909c;transform:rotate(45deg);border-radius:2px;"></div>Global</div>
+                            <div class="gz-legend-item"><div class="gz-legend-line" style="background:#5b6abf;"></div>Action-obj</div>
+                            <div class="gz-legend-item"><div class="gz-legend-line" style="background:#ff9800;border-top:2px dashed #ff9800;height:0;"></div>Attr-obj</div>
+                            <div class="gz-legend-item"><div class="gz-legend-line" style="background:#9c27b0;border-top:2px dotted #9c27b0;height:0;"></div>Attr-action</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="gz-instructions">Hover over grid cells or graph nodes to explore belief-driven connections. Node opacity reflects belief strength.</p>
+            </div>
+            <div class="gz-tooltip" id="gz-tooltip"></div>
+            <!-- End Interactive Graph Construction -->
+
             <hr>
         </div>
 
@@ -499,6 +665,72 @@
                     <p>During online planning, learned approximations enhance MCTS in three ways: (1) <b>Action prioritization</b>: sample actions from P_θ instead of uniformly; (2) <b>Value estimation</b>: replace expensive rollouts with V_θ lookup at leaf nodes; (3) <b>Root action selection</b>: combine visit counts with Q-values using the PUCT formula for robust selection.</p>
                 </div>
             </div>
+
+            <!-- Embedded MCTS Comparison -->
+            <div class="mcts-embed">
+                <div class="mcts-embed-panel baseline">
+                    <h4>Standard MCTS (No Guidance)</h4>
+                    <svg width="100%" viewBox="0 0 400 220">
+                        <g><circle cx="200" cy="28" r="15" fill="#78909c" stroke="#455a64" stroke-width="2"/><text x="200" y="33" text-anchor="middle" font-size="8" fill="white" font-weight="700">b₀</text></g>
+                        <line x1="200" y1="43" x2="60" y2="85" stroke="#999" stroke-width="2"/><text x="115" y="60" font-size="7" fill="#888">MoveN</text>
+                        <line x1="200" y1="43" x2="140" y2="85" stroke="#999" stroke-width="2"/><text x="160" y="65" font-size="7" fill="#888">MoveS</text>
+                        <line x1="200" y1="43" x2="220" y2="85" stroke="#999" stroke-width="2"/><text x="218" y="63" font-size="7" fill="#888">Check</text>
+                        <line x1="200" y1="43" x2="290" y2="85" stroke="#999" stroke-width="2"/><text x="258" y="60" font-size="7" fill="#888">MoveE</text>
+                        <line x1="200" y1="43" x2="360" y2="85" stroke="#999" stroke-width="2"/><text x="300" y="55" font-size="7" fill="#888">Samp</text>
+                        <circle cx="60" cy="95" r="11" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/><text x="60" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="140" cy="95" r="11" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/><text x="140" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="220" cy="95" r="11" fill="#a5d6a7" stroke="#388e3c" stroke-width="1.5"/><text x="220" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="290" cy="95" r="11" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/><text x="290" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="360" cy="95" r="11" fill="#ef9a9a" stroke="#c62828" stroke-width="1.5"/><text x="360" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <line x1="60" y1="106" x2="40" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="60" y1="106" x2="80" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="140" y1="106" x2="125" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="140" y1="106" x2="155" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="220" y1="106" x2="205" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="220" y1="106" x2="235" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <circle cx="40" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="40" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="80" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="80" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="125" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="125" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="155" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="155" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="205" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="205" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="235" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="235" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <text x="200" y="190" text-anchor="middle" font-size="8" fill="#c62828" font-weight="600">Budget spread uniformly, expensive rollouts (?)</text>
+                        <text x="200" y="205" text-anchor="middle" font-size="7.5" fill="#888">Shallow depth, poor value estimates</text>
+                    </svg>
+                </div>
+                <div class="mcts-embed-panel guided">
+                    <h4>GammaZero-Guided MCTS</h4>
+                    <svg width="100%" viewBox="0 0 400 220">
+                        <rect x="70" y="2" width="260" height="14" rx="3" fill="#e8f5e9" stroke="#c8e6c9"/>
+                        <text x="200" y="12" text-anchor="middle" font-size="6.5" fill="#2e7d32" font-weight="600">P(a|G): Check=0.45, MoveE=0.25, Check(R1)=0.20, other=0.10</text>
+                        <g><circle cx="200" cy="32" r="15" fill="#78909c" stroke="#455a64" stroke-width="2"/><text x="200" y="37" text-anchor="middle" font-size="8" fill="white" font-weight="700">b₀</text></g>
+                        <line x1="200" y1="47" x2="130" y2="85" stroke="#2e7d32" stroke-width="4.5" opacity="0.8"/>
+                        <text x="152" y="62" font-size="7.5" fill="#2e7d32" font-weight="700">Check(R2)</text>
+                        <line x1="200" y1="47" x2="260" y2="85" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                        <text x="242" y="63" font-size="7" fill="#5b6abf">MoveE</text>
+                        <line x1="200" y1="47" x2="340" y2="85" stroke="#ff9800" stroke-width="1.5" opacity="0.4"/>
+                        <text x="285" y="58" font-size="6.5" fill="#ff9800">Check(R1)</text>
+                        <line x1="200" y1="47" x2="80" y2="75" stroke="#ddd" stroke-width="1" stroke-dasharray="3,2"/>
+                        <text x="125" y="77" font-size="6" fill="#ccc">pruned</text>
+                        <circle cx="80" cy="82" r="6" fill="#f5f5f5" stroke="#ddd"/>
+                        <circle cx="130" cy="97" r="13" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/><text x="130" y="101" text-anchor="middle" font-size="7.5" fill="white" font-weight="700">b₁</text><text x="130" y="116" text-anchor="middle" font-size="6" fill="#2e7d32" font-weight="600">N=12</text>
+                        <circle cx="260" cy="97" r="11" fill="#90caf9" stroke="#1565c0" stroke-width="1.5"/><text x="260" y="101" text-anchor="middle" font-size="7" fill="white">b₂</text><text x="260" y="115" text-anchor="middle" font-size="6" fill="#666">N=5</text>
+                        <circle cx="340" cy="97" r="9" fill="#ffe0b2" stroke="#e65100" stroke-width="1.5"/><text x="340" y="101" text-anchor="middle" font-size="6.5" fill="#5d4037">b₃</text><text x="340" y="113" text-anchor="middle" font-size="6" fill="#666">N=2</text>
+                        <line x1="130" y1="110" x2="100" y2="145" stroke="#2e7d32" stroke-width="3" opacity="0.7"/>
+                        <line x1="130" y1="110" x2="165" y2="145" stroke="#999" stroke-width="1.5" opacity="0.4"/>
+                        <text x="107" y="130" font-size="6" fill="#2e7d32">obs:good</text>
+                        <circle cx="100" cy="155" r="11" fill="#43a047" stroke="#1b5e20" stroke-width="2"/><text x="100" y="159" text-anchor="middle" font-size="7" fill="white">b₄</text>
+                        <circle cx="165" cy="155" r="8" fill="#fff9c4" stroke="#f9a825" stroke-width="1.5"/>
+                        <line x1="100" y1="166" x2="85" y2="190" stroke="#2e7d32" stroke-width="2" opacity="0.6"/>
+                        <text x="85" y="185" font-size="6" fill="#2e7d32">Sample</text>
+                        <circle cx="85" cy="198" r="9" fill="#2e7d32" stroke="#1b5e20" stroke-width="1.5"/><text x="85" y="202" text-anchor="middle" font-size="6" fill="white">b₅</text>
+                        <rect x="65" y="208" width="40" height="11" rx="2" fill="#1b5e20"/><text x="85" y="216" text-anchor="middle" font-size="6" fill="white" font-weight="600">V=18.5</text>
+                        <rect x="240" y="113" width="38" height="11" rx="2" fill="#78909c"/><text x="259" y="121" text-anchor="middle" font-size="6" fill="white">V=12.3</text>
+                        <rect x="322" y="113" width="34" height="11" rx="2" fill="#ff9800" opacity="0.8"/><text x="339" y="121" text-anchor="middle" font-size="6" fill="white">V=7.4</text>
+                    </svg>
+                </div>
+            </div>
+            <p class="mcts-embed-caption"><b>Left:</b> Standard MCTS spreads budget uniformly across all actions with expensive rollouts. <b>Right:</b> GammaZero's P(a|G) focuses 60% of visits on the best action, discovers the 3-step Check→Sample→Move sequence, and V(G) provides instant leaf evaluation.</p>
 
             <img src="./resources/gz_overview.png" alt="GammaZero Framework Overview" class="visible-image" style="width: 90%;">
             <hr>
@@ -777,8 +1009,7 @@
                     </span>
                 </div>
                 <div class="dropdown-content">
-                    <p>Given a particle belief, we construct a graph with four node types: Object nodes (entities and locations), Attribute instance nodes (created when particle support exceeds threshold τ), Action nodes (parameterized actions), and a Global node. Edges encode attribute-object, action-object, and attribute-action relationships with belief-weighted features.</p>
-                    <img src="./resources/gz_graph_construction.png" alt="GammaZero Belief Graph Construction" class="visible-image" style="width: 100%; background-color: white;">
+                    <p>Given a particle belief, we construct a graph with four node types: Object nodes (entities and locations), Attribute instance nodes (created when particle support exceeds threshold τ), Action nodes (parameterized actions), and a Global node. Edges encode attribute-object, action-object, and attribute-action relationships with belief-weighted features. <em>See the interactive visualization above in "GammaZero's Key Insight" section.</em></p>
                 </div>
             </div>
             <div class="dropdown-item">
@@ -807,6 +1038,91 @@
                     <p><b>LightDark:</b> 1D localization with noisy observations improving near "light" region. <b>RockSample(n,k):</b> Information gathering on n×n grid with k rocks of unknown quality. <b>MultiObjectSearch(n,k):</b> Target localization finding k hidden objects on n×n grid. <b>Rearrangement(n,k):</b> Mobile manipulation transporting k objects with unknown positions to goal locations.</p>
                 </div>
             </div>
+
+            <!-- Embedded Domain Gallery -->
+            <div class="domain-gallery-embed">
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#1a237e,#ffd54f);">LD</div><span class="domain-name-e">LightDark</span></div>
+                    <p class="domain-desc-e">1D localization under position uncertainty. Observations improve near "light" region. Must gather information before committing to goal.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <defs><linearGradient id="ld-g" x1="0%" x2="100%"><stop offset="0%" style="stop-color:#1a237e;stop-opacity:0.7"/><stop offset="55%" style="stop-color:#ffd54f;stop-opacity:0.4"/><stop offset="100%" style="stop-color:#1a237e;stop-opacity:0.4"/></linearGradient></defs>
+                        <rect x="5" y="18" width="120" height="20" rx="3" fill="url(#ld-g)"/>
+                        <circle cx="40" cy="28" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="40" y="31" text-anchor="middle" font-size="5" fill="white" font-weight="700">R</text>
+                        <circle cx="75" cy="28" r="4" fill="none" stroke="#2e7d32" stroke-width="1.5"/>
+                        <text x="75" y="46" text-anchor="middle" font-size="5.5" fill="#2e7d32">goal</text>
+                        <text x="25" y="14" font-size="5.5" fill="#888">dark</text><text x="85" y="14" font-size="5.5" fill="#888">light</text>
+                        <text x="145" y="26" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="158" y="10" width="38" height="14" rx="3" fill="#5b6abf"/><text x="177" y="20" text-anchor="middle" font-size="5" fill="white" font-weight="600">MoveL</text>
+                        <rect x="200" y="10" width="38" height="14" rx="3" fill="#5b6abf"/><text x="219" y="20" text-anchor="middle" font-size="5" fill="white" font-weight="600">MoveR</text>
+                        <circle cx="190" cy="38" r="7" fill="#bbdefb" stroke="#1565c0" stroke-width="1"/><text x="190" y="41" text-anchor="middle" font-size="5" fill="#1565c0" font-weight="700">B</text>
+                        <rect x="215" y="33" width="50" height="11" rx="5" fill="#ff9800" opacity="0.5"/><text x="240" y="41" text-anchor="middle" font-size="5" fill="white" font-weight="600">At(B)~3.2</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: LD(5)</span><span class="domain-tag">Test: LD(10)</span><span class="domain-tag hl">2x scale</span></div>
+                </div>
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#2e7d32,#81c784);">RS</div><span class="domain-name-e">RockSample(n,k)</span></div>
+                    <p class="domain-desc-e">Information gathering on n×n grid with k rocks of unknown quality. Distance-dependent noisy sensor for checking rocks.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <rect x="5" y="5" width="110" height="45" rx="3" fill="#f5f5f5" stroke="#bbb"/>
+                        <polygon points="30,20 35,12 40,20" fill="#81c784" stroke="#388e3c" stroke-width="1"/><text x="35" y="30" text-anchor="middle" font-size="4.5" fill="#388e3c">R1</text>
+                        <polygon points="70,30 75,22 80,30" fill="#9e9e9e" stroke="#666" stroke-width="1" opacity="0.5"/><text x="75" y="40" text-anchor="middle" font-size="4.5" fill="#666">R2?</text>
+                        <circle cx="20" cy="35" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="20" y="38" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">R</text>
+                        <rect x="100" y="5" width="8" height="45" fill="#e8f5e9" opacity="0.5"/>
+                        <text x="130" y="28" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="142" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="161" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Check</text>
+                        <rect x="185" y="5" width="42" height="12" rx="3" fill="#5b6abf"/><text x="206" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Sample</text>
+                        <rect x="232" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="251" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">MoveE</text>
+                        <circle cx="165" cy="32" r="7" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/><text x="165" y="35" text-anchor="middle" font-size="5" fill="#2e7d32" font-weight="700">R1</text>
+                        <circle cx="210" cy="32" r="7" fill="#e8e8e8" stroke="#666" stroke-width="1"/><text x="210" y="35" text-anchor="middle" font-size="5" fill="#555" font-weight="700">R2</text>
+                        <rect x="145" y="44" width="42" height="10" rx="5" fill="#ff9800" opacity="0.8"/><text x="166" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">Good 0.75</text>
+                        <rect x="195" y="44" width="38" height="10" rx="5" fill="#ff9800" opacity="0.4"/><text x="214" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">Good 0.4</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: RS(5,5)-(10,10)</span><span class="domain-tag">Test: RS(25,25)</span><span class="domain-tag hl">6.25x area</span></div>
+                </div>
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#e65100,#ff9800);">MOS</div><span class="domain-name-e">MultiObjectSearch(n,k)</span></div>
+                    <p class="domain-desc-e">Find and declare k hidden objects on n×n grid using range-limited sensor with detection probability.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <rect x="5" y="5" width="110" height="45" rx="3" fill="#fff8e1" stroke="#ffb300"/>
+                        <rect x="55" y="20" width="10" height="10" rx="1" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="2,1.5"/><text x="60" y="40" text-anchor="middle" font-size="4" fill="#e65100">T1?</text>
+                        <rect x="80" y="10" width="10" height="10" rx="1" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="2,1.5"/><text x="85" y="28" text-anchor="middle" font-size="4" fill="#e65100">T2?</text>
+                        <circle cx="30" cy="35" r="12" fill="#42a5f5" opacity="0.1" stroke="#42a5f5" stroke-width="0.6" stroke-dasharray="2,2"/>
+                        <circle cx="30" cy="35" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="30" y="38" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">R</text>
+                        <text x="130" y="28" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="142" y="5" width="32" height="12" rx="3" fill="#5b6abf"/><text x="158" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Look</text>
+                        <rect x="178" y="5" width="48" height="12" rx="3" fill="#5b6abf"/><text x="202" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Declare(T1)</text>
+                        <rect x="230" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="249" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Move</text>
+                        <circle cx="168" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1"/><text x="168" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">T1</text>
+                        <circle cx="215" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1"/><text x="215" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">T2</text>
+                        <rect x="145" y="44" width="45" height="10" rx="5" fill="#ff9800" opacity="0.5"/><text x="167" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(T1)? 0.5</text>
+                        <rect x="198" y="44" width="45" height="10" rx="5" fill="#ff9800" opacity="0.35"/><text x="220" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(T2)? 0.3</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: MOS(3,2)-(4,3)</span><span class="domain-tag">Test: MOS(8,6)</span><span class="domain-tag hl">4x area, 2x obj</span></div>
+                </div>
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#5b6abf,#9c27b0);">RG</div><span class="domain-name-e">Rearrangement(n,k)</span></div>
+                    <p class="domain-desc-e">Locate k objects with unknown positions and transport them to goal locations. Combines perception with multi-step manipulation.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <rect x="5" y="5" width="110" height="45" rx="3" fill="#f3e5f5" stroke="#9c27b0" opacity="0.5"/>
+                        <text x="85" y="17" font-size="8" fill="#2e7d32" opacity="0.4" font-weight="700">X</text>
+                        <text x="85" y="42" font-size="8" fill="#2e7d32" opacity="0.4" font-weight="700">X</text>
+                        <rect x="20" y="22" width="10" height="10" rx="1" fill="#ff9800" stroke="#e65100" stroke-width="1.5"/><text x="25" y="30" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">P1</text>
+                        <rect x="55" y="10" width="10" height="10" rx="1" fill="#ff9800" stroke="#e65100" stroke-width="1" opacity="0.5" stroke-dasharray="2,1.5"/><text x="60" y="18" text-anchor="middle" font-size="4" fill="#e65100">P2?</text>
+                        <circle cx="40" cy="35" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="40" y="38" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">R</text>
+                        <text x="130" y="28" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="142" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="161" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Pick(P1)</text>
+                        <rect x="184" y="5" width="32" height="12" rx="3" fill="#5b6abf"/><text x="200" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Look</text>
+                        <rect x="220" y="5" width="35" height="12" rx="3" fill="#5b6abf"/><text x="237" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Move</text>
+                        <circle cx="165" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1"/><text x="165" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">P1</text>
+                        <circle cx="210" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1" opacity="0.5"/><text x="210" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">P2</text>
+                        <rect x="145" y="44" width="42" height="10" rx="5" fill="#ff9800" opacity="0.7"/><text x="166" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(P1) 0.7</text>
+                        <rect x="195" y="44" width="42" height="10" rx="5" fill="#ff9800" opacity="0.35"/><text x="216" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(P2)? 0.3</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: RG(3,2)-(4,3)</span><span class="domain-tag">Test: RG(8,5)</span><span class="domain-tag hl">4x area, 2.5x obj</span></div>
+                </div>
+            </div>
+            <!-- End Domain Gallery -->
+
             <hr>
         </div>
 
@@ -953,6 +1269,97 @@ $(document).ready(function() {
     });
 
 });
+</script>
+
+<!-- Interactive Graph Construction Script -->
+<script>
+(function() {
+    var tooltip = document.getElementById('gz-tooltip');
+    if (!tooltip) return;
+    var allNodes = document.querySelectorAll('.gz-node');
+    var allEdges = document.querySelectorAll('.gz-edge');
+    var allCells = document.querySelectorAll('.gz-grid-cell');
+
+    var cellMap = {
+        'robot': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: true },
+        'rock-R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1', 'isbad_R1'], global: false },
+        'rock-R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: false },
+        'rock-R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: false }
+    };
+    var nodeMap = {
+        'check_R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1'], global: false },
+        'check_R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: false },
+        'sample_R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: false },
+        'move_east': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: false },
+        'R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1', 'isbad_R1'], global: true },
+        'R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: true },
+        'R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: true },
+        'robot': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: true },
+        'isgood_R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1'], global: false },
+        'isbad_R1': { objects: ['R1'], actions: [], attrs: ['isbad_R1'], global: false },
+        'isgood_R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: false },
+        'isgood_R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: false },
+        'at_robot': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: false },
+        'global': { objects: ['R1', 'R2', 'R3', 'robot'], actions: [], attrs: [], global: true }
+    };
+
+    function showTip(e, t) { tooltip.textContent = t; tooltip.classList.add('visible'); moveTip(e); }
+    function moveTip(e) { tooltip.style.left = (e.clientX + 14) + 'px'; tooltip.style.top = (e.clientY - 10) + 'px'; }
+    function hideTip() { tooltip.classList.remove('visible'); }
+
+    function highlight(m) {
+        allNodes.forEach(function(n) { n.classList.add('gz-dimmed'); });
+        allEdges.forEach(function(e) { e.classList.add('gz-dimmed'); });
+        allCells.forEach(function(c) { c.classList.add('gz-dimmed'); });
+        m.objects.forEach(function(id) {
+            document.querySelectorAll('.gz-node[data-id="'+id+'"]').forEach(function(n) { n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted'); });
+            allCells.forEach(function(c) {
+                var k = c.dataset.hover;
+                if ((k==='robot'&&id==='robot')||(k==='rock-R1'&&id==='R1')||(k==='rock-R2'&&id==='R2')||(k==='rock-R3'&&id==='R3')) {
+                    c.classList.remove('gz-dimmed'); c.classList.add('gz-highlighted-cell');
+                }
+            });
+        });
+        m.actions.forEach(function(id) { document.querySelectorAll('.gz-node[data-id="'+id+'"]').forEach(function(n) { n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted'); }); });
+        m.attrs.forEach(function(id) { document.querySelectorAll('.gz-node[data-id="'+id+'"]').forEach(function(n) { n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted'); }); });
+        if (m.global) { document.querySelectorAll('.gz-node[data-id="global"]').forEach(function(n) { n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted'); }); }
+        allEdges.forEach(function(edge) {
+            var p = edge.dataset.connects.split(' '), src = p[0], tgt = p[1], et = edge.dataset.edge, h = false;
+            if (et==='action-obj' && m.actions.indexOf(src)>=0 && m.objects.indexOf(tgt)>=0) h=true;
+            if (et==='attr-obj' && m.attrs.indexOf(src)>=0 && m.objects.indexOf(tgt)>=0) h=true;
+            if (et==='attr-act' && m.attrs.indexOf(src)>=0 && m.actions.indexOf(tgt)>=0) h=true;
+            if (et==='global' && m.global && m.objects.indexOf(tgt)>=0) h=true;
+            if (h) { edge.classList.remove('gz-dimmed'); edge.classList.add('gz-highlighted'); }
+        });
+    }
+    function clearAll() {
+        allNodes.forEach(function(n) { n.classList.remove('gz-dimmed','gz-highlighted'); });
+        allEdges.forEach(function(e) { e.classList.remove('gz-dimmed','gz-highlighted'); });
+        allCells.forEach(function(c) { c.classList.remove('gz-dimmed','gz-highlighted-cell'); });
+    }
+
+    allCells.forEach(function(cell) {
+        var key = cell.dataset.hover;
+        cell.addEventListener('mouseenter', function(e) {
+            var m = cellMap[key]; if (m) highlight(m);
+            var tips = {
+                'robot': 'Robot at (0,2): position known (belief=1.0). See At(Bot) attribute and MoveEast action.',
+                'rock-R1': 'Rock R1: uncertain quality (40% good). See IsGood/IsBad attributes and Check action.',
+                'rock-R2': 'Rock R2: likely good (75%). See IsGood attribute and Check action.',
+                'rock-R3': 'Rock R3: high confidence good (90%). See IsGood attribute and Sample action.'
+            };
+            showTip(e, tips[key] || key);
+        });
+        cell.addEventListener('mousemove', moveTip);
+        cell.addEventListener('mouseleave', function() { clearAll(); hideTip(); });
+    });
+    allNodes.forEach(function(node) {
+        var id = node.dataset.id;
+        node.addEventListener('mouseenter', function(e) { var m = nodeMap[id]; if (m) highlight(m); showTip(e, node.dataset.tip); });
+        node.addEventListener('mousemove', moveTip);
+        node.addEventListener('mouseleave', function() { clearAll(); hideTip(); });
+    });
+})();
 </script>
 
 </body>
