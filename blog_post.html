@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GammaZero Blog Post</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: 'Charter', 'Georgia', serif;
@@ -114,6 +115,66 @@
         .scale-grid { border: 2px solid #5b6abf; border-radius: 4px; display: inline-block; }
         .scale-label { font-size: 0.7em; color: #666; margin-top: 4px; }
         .scale-arrow { font-size: 1.2em; color: #5b6abf; align-self: center; font-weight: bold; }
+
+        /* Download button styles */
+        .download-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            font-size: 0.72em;
+            font-family: -apple-system, sans-serif;
+            background: #5b6abf;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .download-btn:hover { background: #3d4a9e; }
+        .download-all-container {
+            text-align: center;
+            margin: 2em 0;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            border: 1px dashed #5b6abf;
+        }
+        .download-all-btn {
+            padding: 10px 24px;
+            font-size: 0.9em;
+            font-family: -apple-system, sans-serif;
+            background: #5b6abf;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .download-all-btn:hover { background: #3d4a9e; }
+        .download-all-container p { font-size: 0.8em; color: #666; margin-top: 8px; }
+
+        /* Video embed styles */
+        .video-container {
+            margin: 2em 0;
+            text-align: center;
+        }
+        .video-placeholder {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            aspect-ratio: 16/9;
+            background: #f0f0f0;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .video-placeholder .play-icon { font-size: 2.5em; color: #bbb; }
+        .video-placeholder p { font-size: 0.85em; color: #888; margin: 0; }
     </style>
 </head>
 <body>
@@ -144,7 +205,7 @@
 
 <p>Consider a robot searching for objects on a grid:</p>
 
-<div class="vis-container">
+<div class="vis-container" data-download-name="scaling-bottleneck">
     <div class="scale-demo">
         <div class="scale-box">
             <div class="scale-grid" style="width:50px;height:50px;background:linear-gradient(135deg,#e3f2fd 25%,#bbdefb 75%);"></div>
@@ -178,7 +239,7 @@
 
 <p>Instead of flattening this structure into a fixed vector, we preserve it as a graph:</p>
 
-<div class="vis-container">
+<div class="vis-container" data-download-name="belief-to-graph-pipeline">
     <div class="belief-evo">
         <div class="belief-stage">
             <h5>Particle Belief</h5>
@@ -231,6 +292,16 @@
         </div>
     </div>
     <p class="vis-caption">GammaZero's belief-to-graph pipeline. Particles are aggregated into attribute probabilities, then selectively instantiated as graph nodes based on threshold tau. The resulting graph encodes both structure and uncertainty.</p>
+</div>
+
+<div class="video-container">
+    <p style="font-size:0.9em;color:#444;font-weight:600;margin-bottom:8px;">Interactive Graph Construction Demo</p>
+    <div class="video-placeholder">
+        <div class="play-icon">&#9654;</div>
+        <p>Video: Belief-to-Graph Construction Walkthrough</p>
+        <p style="font-size:0.75em;">[Upload your screen recording of the interactive demo here]</p>
+    </div>
+    <p style="font-size:0.78em;color:#888;margin-top:8px;">Watch how hovering over belief state elements reveals the corresponding graph nodes and edges. Each rock's uncertainty level determines which attribute nodes exist and their connection strengths.</p>
 </div>
 
 <p>The graph has four types of nodes:</p>
@@ -314,7 +385,7 @@
 
 <p>When trained and tested on identical problem sizes, GammaZero matches or exceeds BetaZero across all domains:</p>
 
-<div class="vis-container">
+<div class="vis-container" data-download-name="same-size-results">
     <div class="chart-container">
         <div class="chart-title">Same-Size Performance (Average Return)</div>
         <div class="chart-subtitle">Higher is better. All methods trained and tested on same problem size.</div>
@@ -344,7 +415,7 @@
 
 <p>The unique capability: GammaZero can generalize to problems significantly larger than training instances. BetaZero cannot—its architecture physically won't accept larger inputs.</p>
 
-<div class="vis-container">
+<div class="vis-container" data-download-name="zero-shot-results">
     <div class="chart-container">
         <div class="chart-title">Zero-Shot Generalization (Average Return)</div>
         <div class="chart-subtitle">GammaZero trained on small instances (5x5 to 10x10), tested on larger. Classical baselines retrained per-size.</div>
@@ -392,7 +463,7 @@
 
 <p>The complete system combines three learned components with online search. Each plays a distinct role:</p>
 
-<div class="vis-container">
+<div class="vis-container" data-download-name="ablation-components">
     <table class="compare-table">
         <tr>
             <th>Component</th>
@@ -432,7 +503,7 @@
 
 <p>To understand where GammaZero sits in the landscape, here's how it compares to existing approaches:</p>
 
-<div class="vis-container">
+<div class="vis-container" data-download-name="approach-comparison">
     <table class="compare-table">
         <tr>
             <th></th>
@@ -578,6 +649,100 @@
 
 <p><em>Paper: "GammaZero: Learning to Guide Belief-Space Search for Long-Horizon POMDPs with Generalizable Graph Representations"</em></p>
 <p><em>Code and project page: <a href="https://arxiv.org/abs/2510.14035">arXiv:2510.14035</a></em></p>
+
+<hr>
+
+<div class="download-all-container">
+    <button class="download-all-btn" onclick="downloadAllVisualizations()">Download All Visualizations as PNG</button>
+    <p>For Substack: download each visualization as a high-resolution PNG image, then upload to your post.</p>
+</div>
+
+<script>
+// Download individual visualization as PNG
+function downloadVisualization(container, filename) {
+    // Hide all download buttons inside the container before capture
+    var btns = container.querySelectorAll('.download-btn');
+    btns.forEach(function(b) { b.style.display = 'none'; });
+    html2canvas(container, {
+        scale: 3,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false
+    }).then(function(canvas) {
+        btns.forEach(function(b) { b.style.display = ''; });
+        var link = document.createElement('a');
+        link.download = filename + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+
+// Add download buttons to each visualization
+document.addEventListener('DOMContentLoaded', function() {
+    var containers = document.querySelectorAll('.vis-container[data-download-name]');
+    containers.forEach(function(container) {
+        var btn = document.createElement('button');
+        btn.className = 'download-btn';
+        btn.textContent = 'Download as PNG';
+        btn.onclick = function(e) {
+            e.preventDefault();
+            var name = container.getAttribute('data-download-name');
+            btn.textContent = 'Generating...';
+            btn.disabled = true;
+            downloadVisualization(container, 'gammazero-' + name);
+            setTimeout(function() {
+                btn.textContent = 'Download as PNG';
+                btn.disabled = false;
+            }, 2000);
+        };
+        // Insert button in the caption area
+        var caption = container.querySelector('.vis-caption');
+        if (caption) {
+            caption.parentNode.insertBefore(btn, caption.nextSibling);
+        } else {
+            container.appendChild(btn);
+        }
+    });
+});
+
+// Download all visualizations sequentially
+function downloadAllVisualizations() {
+    var containers = document.querySelectorAll('.vis-container[data-download-name]');
+    var btn = document.querySelector('.download-all-btn');
+    var total = containers.length;
+    var current = 0;
+    btn.textContent = 'Downloading 0/' + total + '...';
+    btn.disabled = true;
+
+    function downloadNext() {
+        if (current >= total) {
+            btn.textContent = 'Done! All ' + total + ' downloaded.';
+            setTimeout(function() {
+                btn.textContent = 'Download All Visualizations as PNG';
+                btn.disabled = false;
+            }, 3000);
+            return;
+        }
+        var container = containers[current];
+        var name = container.getAttribute('data-download-name');
+        html2canvas(container, {
+            scale: 3,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false
+        }).then(function(canvas) {
+            var link = document.createElement('a');
+            link.download = 'gammazero-' + name + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            current++;
+            btn.textContent = 'Downloading ' + current + '/' + total + '...';
+            setTimeout(downloadNext, 800);
+        });
+    }
+    downloadNext();
+}
+</script>
 
 </body>
 </html>

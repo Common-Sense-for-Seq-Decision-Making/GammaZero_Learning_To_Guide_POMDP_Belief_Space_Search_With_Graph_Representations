@@ -276,6 +276,35 @@
     .mcts-embed-caption { text-align: center; font-size: 0.78em; color: #666; margin-top: 10px; padding: 8px 14px; background: #f8f9ff; border-radius: 5px; border: 1px solid #eee; }
     @media (max-width: 850px) { .mcts-embed { flex-direction: column; align-items: center; } .mcts-embed-panel { min-width: unset; width: 100%; } }
 
+    /* Results Bar Chart Styles */
+    .results-chart-container { margin: 20px 0; padding: 20px; background: #fafafa; border-radius: 10px; border: 1px solid #eee; }
+    .results-chart-title { text-align: center; font-size: 1em; font-weight: 700; color: #333; margin-bottom: 4px; }
+    .results-chart-subtitle { text-align: center; font-size: 0.78em; color: #888; margin-bottom: 14px; }
+    .results-chart { display: flex; flex-direction: column; gap: 5px; }
+    .results-chart-row { display: flex; align-items: center; gap: 8px; }
+    .results-chart-label { width: 130px; font-size: 0.78em; font-weight: 600; color: #444; text-align: right; }
+    .results-chart-bar-track { flex: 1; height: 22px; background: #eee; border-radius: 4px; overflow: hidden; }
+    .results-chart-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 0.7em; font-weight: 700; color: white; transition: width 0.3s; }
+    .results-chart-bar.small-val { justify-content: flex-start; padding-left: 6px; color: #333; }
+    .results-chart-domain { font-weight: 700; font-size: 0.82em; color: #555; margin: 10px 0 5px; padding: 3px 8px; background: #f0f0f0; border-radius: 3px; display: inline-block; }
+    .results-chart-caption { text-align: center; font-size: 0.78em; color: #666; margin-top: 12px; font-style: italic; }
+    .results-chart-legend { display: flex; justify-content: center; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+    .results-chart-legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.72em; color: #555; }
+    .results-chart-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+    /* Collapsed Table Styles */
+    .table-collapse-header {
+        font-size: 0.9em; font-weight: 600; cursor: pointer; padding: 10px 14px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 5px; margin-top: 15px;
+        transition: background 0.2s;
+    }
+    .table-collapse-header:hover { background: #f0f0f0; }
+    .table-collapse-header .icon { transition: transform 0.2s; font-size: 0.85em; color: #888; }
+    .table-collapse-header.active .icon { transform: rotate(180deg); }
+    .table-collapse-header.active { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+    .table-collapse-body { display: none; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 5px 5px; padding: 15px; }
+
     /* Domain Gallery Styles */
     .domain-gallery-embed { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
     @media (max-width: 700px) { .domain-gallery-embed { grid-template-columns: 1fr; } }
@@ -469,6 +498,33 @@
                     <p>While GNNs have proven effective for fully observable planning (e.g., GABAR), extending them to partial observability is non-trivial. The key challenge is encoding belief uncertainty while preserving the structural patterns that enable generalization—something not addressed by prior work.</p>
                 </div>
             </div>
+
+            <!-- Scaling Visualization -->
+            <div class="results-chart-container" style="padding:20px 15px;">
+                <div class="results-chart-title" style="font-size:0.95em;">The Fixed-Representation Bottleneck</div>
+                <div class="results-chart-subtitle">BetaZero's architecture must be redesigned for each problem scale</div>
+                <div style="display:flex;gap:15px;align-items:flex-end;justify-content:center;margin:15px 0;flex-wrap:wrap;">
+                    <div style="text-align:center;">
+                        <div style="width:55px;height:55px;border:3px solid #5b6abf;border-radius:5px;background:linear-gradient(135deg,#e3f2fd 25%,#bbdefb 75%);margin:0 auto;"></div>
+                        <div style="font-size:0.72em;color:#555;margin-top:5px;">5×5 grid, 3 objects</div>
+                        <div style="font-size:0.7em;font-weight:700;color:#2e7d32;">Train here</div>
+                    </div>
+                    <div style="font-size:1.3em;color:#5b6abf;align-self:center;font-weight:bold;">→</div>
+                    <div style="text-align:center;">
+                        <div style="width:80px;height:80px;border:3px solid #e74c3c;border-radius:5px;background:linear-gradient(135deg,#e3f2fd 25%,#bbdefb 75%);margin:0 auto;"></div>
+                        <div style="font-size:0.72em;color:#555;margin-top:5px;">10×10 grid, 10 objects</div>
+                        <div style="font-size:0.7em;font-weight:700;color:#e74c3c;">Can't deploy ✗</div>
+                    </div>
+                    <div style="font-size:1.3em;color:#5b6abf;align-self:center;font-weight:bold;">→</div>
+                    <div style="text-align:center;">
+                        <div style="width:110px;height:110px;border:3px solid #e74c3c;border-radius:5px;background:linear-gradient(135deg,#e3f2fd 25%,#bbdefb 75%);margin:0 auto;"></div>
+                        <div style="font-size:0.72em;color:#555;margin-top:5px;">20×20 grid, 20 objects</div>
+                        <div style="font-size:0.7em;font-weight:700;color:#e74c3c;">Retrain from scratch ✗</div>
+                    </div>
+                </div>
+                <p class="results-chart-caption">Fixed-dimensional representations require retraining for each problem size. GammaZero's graph representation handles arbitrary sizes with the same trained weights.</p>
+            </div>
+
             <hr>
         </div>
 
@@ -781,9 +837,81 @@
                 </div>
             </div>
             
-            <div class="table-caption" style="margin-top: 25px;">
-                <b>Table 1:</b> Same-size performance comparison (Returns ± SE). All methods trained and tested on the same problem size.
+            <!-- Results Bar Charts (Primary Visual) -->
+            <div class="results-chart-container">
+                <div class="results-chart-title">Same-Size Performance Comparison</div>
+                <div class="results-chart-subtitle">Average Return (higher is better). All methods trained and tested on the same problem size.</div>
+                <div class="results-chart-legend">
+                    <div class="results-chart-legend-item"><div class="results-chart-legend-dot" style="background:#5b6abf;"></div>GammaZero (Full)</div>
+                    <div class="results-chart-legend-item"><div class="results-chart-legend-dot" style="background:#8e99cc;"></div>BetaZero (Full)</div>
+                    <div class="results-chart-legend-item"><div class="results-chart-legend-dot" style="background:#bbb;"></div>Best Classical</div>
+                </div>
+                <div class="results-chart">
+                    <div class="results-chart-domain">LightDark(10)</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:87.5%;background:#5b6abf;">17.5</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">BetaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:83.9%;background:#8e99cc;">16.8</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:26.1%;background:#bbb;">5.2</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">RockSample(15,15)</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:82%;background:#5b6abf;">20.5</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">BetaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:80.6%;background:#8e99cc;">20.2</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:82.7%;background:#bbb;">20.7</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">MultiObjectSearch(5,3)</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:90%;background:#5b6abf;">18.0</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:77.5%;background:#bbb;">15.5</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">POMCPOW</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:37.5%;background:#ddd;">7.5</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">Rearrangement(5,2)</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:62.5%;background:#5b6abf;">12.5</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:38.5%;background:#bbb;">7.7</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">POMCPOW</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:21.5%;background:#ddd;">4.3</div></div></div>
+                </div>
+                <p class="results-chart-caption">GammaZero matches or exceeds BetaZero on same-sized problems across all domains, while substantially outperforming classical baselines in information-gathering tasks.</p>
             </div>
+
+            <div class="results-chart-container">
+                <div class="results-chart-title">Zero-Shot Generalization Performance</div>
+                <div class="results-chart-subtitle">GammaZero trained on small instances, tested on 2-6x larger. Classical baselines configured per-size.</div>
+                <div class="results-chart-legend">
+                    <div class="results-chart-legend-item"><div class="results-chart-legend-dot" style="background:#5b6abf;"></div>GammaZero (zero-shot)</div>
+                    <div class="results-chart-legend-item"><div class="results-chart-legend-dot" style="background:#bbb;"></div>Best Classical (per-size)</div>
+                    <div class="results-chart-legend-item"><div class="results-chart-legend-dot" style="background:#e74c3c;"></div>Timeout/Failure</div>
+                </div>
+                <div class="results-chart">
+                    <div class="results-chart-domain">RockSample(15,15) — 2.25x training area</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:86%;background:#5b6abf;">17.8</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:100%;background:#bbb;">20.7</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">RockSample(20,20) — 4x training area</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:87.5%;background:#5b6abf;">10.2</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:100%;background:#bbb;">11.7</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">DESPOT</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:5%;background:#e74c3c;">timeout</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">RockSample(25,25) — 6.25x training area</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero (P)</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:100%;background:#7c8ad4;">4.8</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:87.5%;background:#bbb;">4.2</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">DESPOT</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:5%;background:#e74c3c;">timeout</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">MOS(8,6) — 4x area, 2x objects</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:100%;background:#5b6abf;">8.0</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:72.5%;background:#bbb;">5.8</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">POMCPOW/DESPOT</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:5%;background:#e74c3c;">timeout</div></div></div>
+
+                    <div class="results-chart-domain" style="margin-top:12px">Rearrangement(8,5) — 4x area, 2.5x objects</div>
+                    <div class="results-chart-row"><div class="results-chart-label">GammaZero</div><div class="results-chart-bar-track"><div class="results-chart-bar" style="width:100%;background:#5b6abf;">4.5</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">AdaOPS</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:55.6%;background:#bbb;">2.5</div></div></div>
+                    <div class="results-chart-row"><div class="results-chart-label">POMCPOW/DESPOT</div><div class="results-chart-bar-track"><div class="results-chart-bar small-val" style="width:5%;background:#e74c3c;">timeout</div></div></div>
+                </div>
+                <p class="results-chart-caption">GammaZero trained on small problems generalizes to 2-6x larger instances. Classical baselines increasingly timeout at larger scales, while GammaZero maintains competitive performance.</p>
+            </div>
+
+            <!-- Collapsible Tables -->
+            <div class="table-collapse-header" onclick="$(this).toggleClass('active');$(this).next('.table-collapse-body').slideToggle(200);">
+                <span><b>Table 1:</b> Same-size performance comparison (full data)</span>
+                <span class="icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="table-collapse-body">
             <div class="results-table-container">
                 <table class="results-table" style="min-width: 900px;">
                     <thead>
@@ -830,10 +958,13 @@
                     </tbody>
                 </table>
             </div>
+            </div><!-- end table-collapse-body -->
 
-            <div class="table-caption" style="margin-top: 25px;">
-                <b>Table 2:</b> Zero-shot generalization (Returns ± SE). GammaZero trained on small problems, tested on larger sizes. Classical baselines trained per-size for reference. <sup>†</sup>Search timeout/failure.
+            <div class="table-collapse-header" onclick="$(this).toggleClass('active');$(this).next('.table-collapse-body').slideToggle(200);">
+                <span><b>Table 2:</b> Zero-shot generalization (full data) <sup>†</sup>timeout/failure</span>
+                <span class="icon"><i class="fas fa-chevron-down"></i></span>
             </div>
+            <div class="table-collapse-body">
             <div class="results-table-container">
                 <table class="results-table" style="min-width: 900px;">
                     <thead>
@@ -904,6 +1035,7 @@
                     </tbody>
                 </table>
             </div>
+            </div><!-- end table-collapse-body -->
 
             <div class="dropdown-item">
                 <div class="dropdown-header">
