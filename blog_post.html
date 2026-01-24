@@ -660,12 +660,16 @@
 <script>
 // Download individual visualization as PNG
 function downloadVisualization(container, filename) {
+    // Hide all download buttons inside the container before capture
+    var btns = container.querySelectorAll('.download-btn');
+    btns.forEach(function(b) { b.style.display = 'none'; });
     html2canvas(container, {
         scale: 3,
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false
     }).then(function(canvas) {
+        btns.forEach(function(b) { b.style.display = ''; });
         var link = document.createElement('a');
         link.download = filename + '.png';
         link.href = canvas.toDataURL('image/png');
