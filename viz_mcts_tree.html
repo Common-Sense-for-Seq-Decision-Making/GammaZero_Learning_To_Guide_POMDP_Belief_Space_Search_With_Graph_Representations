@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GammaZero: MCTS with Learned Guidance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .mcts-container { max-width: 1050px; width: 100%; }
+        .mcts-title { text-align: center; font-size: 1.3em; font-weight: 700; color: #333; margin-bottom: 4px; }
+        .mcts-subtitle { text-align: center; font-size: 0.85em; color: #777; margin-bottom: 20px; }
+        .mcts-comparison {
+            display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;
+        }
+        .mcts-panel {
+            background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06); flex: 1; min-width: 420px; max-width: 500px;
+        }
+        .mcts-panel h3 {
+            text-align: center; font-size: 0.9em; font-weight: 700;
+            margin-bottom: 12px; padding: 6px 12px; border-radius: 4px;
+        }
+        .mcts-panel.baseline h3 { background: #ffebee; color: #c62828; }
+        .mcts-panel.guided h3 { background: #e8f5e9; color: #2e7d32; }
+        .mcts-legend {
+            display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center;
+            margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee;
+        }
+        .mcts-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.72em; color: #555; }
+        .mcts-legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .mcts-legend-line { width: 20px; height: 3px; border-radius: 2px; }
+        .mcts-annotation {
+            text-align: center; font-size: 0.8em; color: #666; margin-top: 16px;
+            padding: 10px 16px; background: #f5f5ff; border-radius: 6px;
+            border: 1px solid #e8e8f8;
+        }
+        .mcts-callout {
+            font-size: 0.75em; fill: #555; font-style: italic;
+        }
+        .node-tooltip {
+            position: fixed; background: #333; color: white;
+            padding: 6px 12px; border-radius: 5px; font-size: 0.78em;
+            pointer-events: none; opacity: 0; transition: opacity 0.15s;
+            z-index: 1000; max-width: 240px; line-height: 1.3;
+        }
+        .node-tooltip.visible { opacity: 1; }
+        .mcts-node { cursor: pointer; }
+        .mcts-node:hover circle { filter: brightness(1.1) drop-shadow(0 0 3px rgba(0,0,0,0.3)); }
+    </style>
+</head>
+<body>
+<div class="mcts-container">
+    <div class="mcts-title">How Learned Guidance Focuses MCTS Search</div>
+    <p class="mcts-subtitle">Left: Uniform expansion wastes budget on bad actions. Right: P(a|G) prioritizes promising branches, V(G) evaluates leaves instantly.</p>
+
+    <div class="mcts-comparison">
+        <!-- BASELINE: No learned guidance -->
+        <div class="mcts-panel baseline">
+            <h3>Without Learned Guidance (Standard MCTS)</h3>
+            <svg width="100%" viewBox="0 0 460 340">
+                <!-- Level 0: Root -->
+                <g class="mcts-node" data-tip="Root belief: Robot at (0,2), 3 rocks with unknown quality. Must decide next action.">
+                    <circle cx="230" cy="35" r="18" fill="#78909c" stroke="#455a64" stroke-width="2"/>
+                    <text x="230" y="40" text-anchor="middle" font-size="9" fill="white" font-weight="700">b₀</text>
+                </g>
+
+                <!-- Level 1: All actions explored equally -->
+                <!-- MoveNorth -->
+                <line x1="230" y1="53" x2="70" y2="105" stroke="#999" stroke-width="2.5"/>
+                <text x="130" y="72" font-size="7.5" fill="#888" text-anchor="middle">MoveN</text>
+                <g class="mcts-node" data-tip="After MoveNorth: Robot moved away from rocks. Wasteful exploration.">
+                    <circle cx="70" cy="120" r="15" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/>
+                    <text x="70" y="124" text-anchor="middle" font-size="7.5" fill="white">b₁</text>
+                </g>
+
+                <!-- MoveSouth -->
+                <line x1="230" y1="53" x2="160" y2="105" stroke="#999" stroke-width="2.5"/>
+                <text x="185" y="82" font-size="7.5" fill="#888" text-anchor="middle">MoveS</text>
+                <g class="mcts-node" data-tip="After MoveSouth: Robot moved away from rocks. Wasteful exploration.">
+                    <circle cx="160" cy="120" r="15" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/>
+                    <text x="160" y="124" text-anchor="middle" font-size="7.5" fill="white">b₂</text>
+                </g>
+
+                <!-- Check(R1) -->
+                <line x1="230" y1="53" x2="250" y2="105" stroke="#999" stroke-width="2.5"/>
+                <text x="248" y="78" font-size="7.5" fill="#888" text-anchor="middle">Check1</text>
+                <g class="mcts-node" data-tip="After Check(R1): Information gained about R1. Useful but not best first choice.">
+                    <circle cx="250" cy="120" r="15" fill="#a5d6a7" stroke="#388e3c" stroke-width="1.5"/>
+                    <text x="250" y="124" text-anchor="middle" font-size="7.5" fill="white">b₃</text>
+                </g>
+
+                <!-- MoveEast -->
+                <line x1="230" y1="53" x2="340" y2="105" stroke="#999" stroke-width="2.5"/>
+                <text x="298" y="75" font-size="7.5" fill="#888" text-anchor="middle">MoveE</text>
+                <g class="mcts-node" data-tip="After MoveEast: Moving toward exit without sampling. Premature.">
+                    <circle cx="340" cy="120" r="15" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/>
+                    <text x="340" y="124" text-anchor="middle" font-size="7.5" fill="white">b₄</text>
+                </g>
+
+                <!-- Sample(R3) -->
+                <line x1="230" y1="53" x2="420" y2="105" stroke="#999" stroke-width="2.5"/>
+                <text x="345" y="68" font-size="7.5" fill="#888" text-anchor="middle">Samp3</text>
+                <g class="mcts-node" data-tip="After Sample(R3): Not co-located, action fails. Wasteful.">
+                    <circle cx="420" cy="120" r="15" fill="#ef9a9a" stroke="#c62828" stroke-width="1.5"/>
+                    <text x="420" y="124" text-anchor="middle" font-size="7.5" fill="white">b₅</text>
+                </g>
+
+                <!-- Level 2: Shallow exploration from each -->
+                <line x1="70" y1="135" x2="40" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <line x1="70" y1="135" x2="95" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <circle cx="40" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+                <circle cx="95" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+
+                <line x1="160" y1="135" x2="135" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <line x1="160" y1="135" x2="180" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <circle cx="135" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+                <circle cx="180" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+
+                <line x1="250" y1="135" x2="230" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <line x1="250" y1="135" x2="270" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <circle cx="230" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+                <circle cx="270" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+
+                <line x1="340" y1="135" x2="320" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <line x1="340" y1="135" x2="360" y2="185" stroke="#ccc" stroke-width="1.5"/>
+                <circle cx="320" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+                <circle cx="360" cy="195" r="10" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+
+                <!-- Rollout indicators (question marks) -->
+                <text x="40" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="95" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="135" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="180" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="230" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="270" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="320" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+                <text x="360" y="225" text-anchor="middle" font-size="8" fill="#e74c3c">?</text>
+
+                <!-- Annotations -->
+                <text x="230" y="260" text-anchor="middle" font-size="8.5" fill="#c62828" font-weight="600">Expensive random rollouts at each leaf</text>
+                <text x="230" y="278" text-anchor="middle" font-size="8" fill="#888">Budget spread uniformly across all actions</text>
+                <text x="230" y="296" text-anchor="middle" font-size="8" fill="#888">Shallow depth, poor value estimates</text>
+
+                <!-- Visit counts -->
+                <text x="70" y="143" text-anchor="middle" font-size="6.5" fill="#666">N=4</text>
+                <text x="160" y="143" text-anchor="middle" font-size="6.5" fill="#666">N=4</text>
+                <text x="250" y="143" text-anchor="middle" font-size="6.5" fill="#666">N=4</text>
+                <text x="340" y="143" text-anchor="middle" font-size="6.5" fill="#666">N=4</text>
+                <text x="420" y="143" text-anchor="middle" font-size="6.5" fill="#666">N=4</text>
+            </svg>
+        </div>
+
+        <!-- GUIDED: With GammaZero -->
+        <div class="mcts-panel guided">
+            <h3>With GammaZero (Policy + Value Guided)</h3>
+            <svg width="100%" viewBox="0 0 460 340">
+                <!-- Level 0: Root -->
+                <g class="mcts-node" data-tip="Root belief: Same starting state. P(a|G) assigns probabilities to each action.">
+                    <circle cx="230" cy="35" r="18" fill="#78909c" stroke="#455a64" stroke-width="2"/>
+                    <text x="230" y="40" text-anchor="middle" font-size="9" fill="white" font-weight="700">b₀</text>
+                </g>
+
+                <!-- Policy distribution shown above branches -->
+                <rect x="50" y="4" width="360" height="16" rx="3" fill="#e8f5e9" stroke="#c8e6c9"/>
+                <text x="230" y="14" text-anchor="middle" font-size="7" fill="#2e7d32" font-weight="600">P(a|G): Check(R2)=0.45, MoveE=0.25, Check(R1)=0.20, MoveN=0.05, Samp=0.05</text>
+
+                <!-- HIGH PRIORITY: Check(R2) - thick line -->
+                <line x1="230" y1="53" x2="160" y2="105" stroke="#2e7d32" stroke-width="5" opacity="0.8"/>
+                <text x="182" y="72" font-size="8" fill="#2e7d32" font-weight="700">Check(R2)</text>
+                <text x="182" y="82" font-size="6.5" fill="#2e7d32">P=0.45</text>
+                <g class="mcts-node" data-tip="After Check(R2): High-priority action. Reduces uncertainty on rock with 75% belief. Most visited node.">
+                    <circle cx="160" cy="120" r="16" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/>
+                    <text x="160" y="124" text-anchor="middle" font-size="8" fill="white" font-weight="700">b₁</text>
+                </g>
+
+                <!-- MEDIUM: MoveEast -->
+                <line x1="230" y1="53" x2="290" y2="105" stroke="#5b6abf" stroke-width="3" opacity="0.7"/>
+                <text x="270" y="75" font-size="7.5" fill="#5b6abf" font-weight="600">MoveE</text>
+                <text x="270" y="85" font-size="6.5" fill="#5b6abf">P=0.25</text>
+                <g class="mcts-node" data-tip="After MoveEast: Moderate priority. Good if rocks are already assessed.">
+                    <circle cx="290" cy="120" r="14" fill="#90caf9" stroke="#1565c0" stroke-width="1.5"/>
+                    <text x="290" y="124" text-anchor="middle" font-size="7.5" fill="white">b₂</text>
+                </g>
+
+                <!-- LOW: Check(R1) -->
+                <line x1="230" y1="53" x2="380" y2="105" stroke="#ff9800" stroke-width="2" opacity="0.5"/>
+                <text x="318" y="70" font-size="7" fill="#ff9800">Check(R1)</text>
+                <text x="318" y="80" font-size="6.5" fill="#ff9800">P=0.20</text>
+                <g class="mcts-node" data-tip="After Check(R1): Lower priority. R1 is further away, check accuracy is low.">
+                    <circle cx="380" cy="120" r="12" fill="#ffe0b2" stroke="#e65100" stroke-width="1.5"/>
+                    <text x="380" y="124" text-anchor="middle" font-size="7" fill="#5d4037">b₃</text>
+                </g>
+
+                <!-- PRUNED: MoveNorth, Sample (dimmed) -->
+                <line x1="230" y1="53" x2="80" y2="95" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="140" y="93" font-size="6.5" fill="#ccc">MoveN (P=0.05)</text>
+                <circle cx="80" cy="105" r="8" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+
+                <line x1="230" y1="53" x2="440" y2="95" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="365" y="93" font-size="6.5" fill="#ccc">Samp (P=0.05)</text>
+                <circle cx="440" cy="105" r="8" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+
+                <!-- Level 2: Deep exploration on promising branch -->
+                <!-- Check(R2) subtree - deep -->
+                <line x1="160" y1="136" x2="110" y2="175" stroke="#2e7d32" stroke-width="3" opacity="0.7"/>
+                <line x1="160" y1="136" x2="200" y2="175" stroke="#2e7d32" stroke-width="2" opacity="0.5"/>
+                <text x="125" y="160" font-size="6.5" fill="#2e7d32">obs:good</text>
+                <text x="190" y="158" font-size="6.5" fill="#888">obs:bad</text>
+
+                <g class="mcts-node" data-tip="After positive observation: Rock confirmed good. High value, proceed to sample.">
+                    <circle cx="110" cy="190" r="14" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/>
+                    <text x="110" y="194" text-anchor="middle" font-size="7.5" fill="white">b₄</text>
+                </g>
+                <g class="mcts-node" data-tip="After negative observation: Rock likely bad. Skip and check other rocks.">
+                    <circle cx="200" cy="190" r="12" fill="#fff9c4" stroke="#f9a825" stroke-width="1.5"/>
+                    <text x="200" y="194" text-anchor="middle" font-size="7" fill="#5d4037">b₅</text>
+                </g>
+
+                <!-- Level 3: Even deeper on best path -->
+                <line x1="110" y1="204" x2="80" y2="240" stroke="#2e7d32" stroke-width="2.5" opacity="0.6"/>
+                <line x1="110" y1="204" x2="140" y2="240" stroke="#999" stroke-width="1.5" opacity="0.4"/>
+                <text x="85" y="225" font-size="6.5" fill="#2e7d32">Sample</text>
+
+                <g class="mcts-node" data-tip="After Sample(R2): Rock collected, +10 reward. Deep planning finds this sequence.">
+                    <circle cx="80" cy="255" r="13" fill="#43a047" stroke="#1b5e20" stroke-width="2"/>
+                    <text x="80" y="259" text-anchor="middle" font-size="7" fill="white">b₆</text>
+                </g>
+                <circle cx="140" cy="252" r="9" fill="#e0e0e0" stroke="#999" stroke-width="1"/>
+
+                <!-- Value estimates (V_theta) at leaves -->
+                <rect x="55" y="272" width="50" height="14" rx="3" fill="#1b5e20"/>
+                <text x="80" y="282" text-anchor="middle" font-size="7" fill="white" font-weight="600">V=18.5</text>
+
+                <rect x="122" y="252" width="38" height="12" rx="3" fill="#78909c"/>
+                <text x="141" y="261" text-anchor="middle" font-size="6.5" fill="white">V=8.2</text>
+
+                <rect x="180" y="206" width="40" height="12" rx="3" fill="#f9a825"/>
+                <text x="200" y="215" text-anchor="middle" font-size="6.5" fill="white">V=5.1</text>
+
+                <rect x="270" y="138" width="40" height="12" rx="3" fill="#78909c"/>
+                <text x="290" y="147" text-anchor="middle" font-size="6.5" fill="white">V=12.3</text>
+
+                <rect x="360" y="136" width="38" height="12" rx="3" fill="#ff9800" opacity="0.8"/>
+                <text x="379" y="145" text-anchor="middle" font-size="6.5" fill="white">V=7.4</text>
+
+                <!-- Annotations -->
+                <text x="230" y="305" text-anchor="middle" font-size="8.5" fill="#2e7d32" font-weight="600">V(G) provides instant leaf evaluation</text>
+                <text x="230" y="320" text-anchor="middle" font-size="8" fill="#555">Budget focused on promising actions (thick = more visits)</text>
+                <text x="230" y="335" text-anchor="middle" font-size="8" fill="#555">Deeper search on best path finds Check&#8594;Sample sequence</text>
+
+                <!-- Visit counts -->
+                <text x="160" y="143" text-anchor="middle" font-size="6.5" fill="#1b5e20" font-weight="600">N=12</text>
+                <text x="290" y="140" text-anchor="middle" font-size="6.5" fill="#666">N=5</text>
+                <text x="380" y="138" text-anchor="middle" font-size="6.5" fill="#666">N=2</text>
+            </svg>
+        </div>
+    </div>
+
+    <div class="mcts-annotation">
+        <strong>Key insight:</strong> With the same simulation budget (20 simulations), GammaZero's learned policy focuses 60% of visits on the best action (Check R2),
+        discovers the 3-step Check&#8594;Sample&#8594;Move sequence, and uses V(G) for instant leaf evaluation instead of expensive rollouts.
+    </div>
+
+    <div class="mcts-legend">
+        <div class="mcts-legend-item"><div class="mcts-legend-dot" style="background:#78909c;"></div>Root belief</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-dot" style="background:#66bb6a;"></div>High-value node</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-dot" style="background:#90caf9;"></div>Medium-value</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-dot" style="background:#ffe0b2;"></div>Low-value</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-dot" style="background:#f5f5f5;border:1px solid #ddd;"></div>Pruned (low P)</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-line" style="background:#2e7d32;height:4px;"></div>High priority</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-line" style="background:#5b6abf;"></div>Medium priority</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-line" style="background:#ddd;border-top:1px dashed #ccc;height:0;"></div>Low priority</div>
+        <div class="mcts-legend-item"><div class="mcts-legend-dot" style="background:#1b5e20;border-radius:3px;width:14px;"></div>V(G) estimate</div>
+    </div>
+</div>
+
+<div class="node-tooltip" id="mcts-tooltip"></div>
+
+<script>
+(function() {
+    var tooltip = document.getElementById('mcts-tooltip');
+    var nodes = document.querySelectorAll('.mcts-node');
+    nodes.forEach(function(node) {
+        node.addEventListener('mouseenter', function(e) {
+            tooltip.textContent = node.dataset.tip;
+            tooltip.classList.add('visible');
+            tooltip.style.left = (e.clientX + 12) + 'px';
+            tooltip.style.top = (e.clientY - 8) + 'px';
+        });
+        node.addEventListener('mousemove', function(e) {
+            tooltip.style.left = (e.clientX + 12) + 'px';
+            tooltip.style.top = (e.clientY - 8) + 'px';
+        });
+        node.addEventListener('mouseleave', function() {
+            tooltip.classList.remove('visible');
+        });
+    });
+})();
+</script>
+</body>
+</html>
