@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GammaZero: Interactive Belief Graph Construction</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .gz-container { max-width: 1100px; width: 100%; }
+        .gz-title { text-align: center; color: #333; margin-bottom: 4px; font-size: 1.3em; font-weight: 700; }
+        .gz-subtitle { text-align: center; color: #777; font-size: 0.88em; margin-bottom: 16px; }
+        .gz-layout { display: flex; gap: 14px; align-items: stretch; justify-content: center; }
+        .gz-belief-panel {
+            background: white; border-radius: 10px; padding: 16px 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex; flex-direction: column; align-items: center;
+            width: 220px; flex-shrink: 0;
+        }
+        .gz-belief-panel h4 { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .gz-graph-panel {
+            background: white; border-radius: 10px; padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); flex: 1;
+        }
+        .gz-graph-panel h4 { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; text-align: center; }
+        .gz-arrow { font-size: 1.6em; color: #ccc; align-self: center; padding: 0 4px; }
+        .gz-grid-cell {
+            cursor: pointer;
+            transition: opacity 0.2s, filter 0.2s;
+        }
+        .gz-grid-cell:hover rect { filter: brightness(1.1); }
+        .gz-node { cursor: pointer; }
+        .gz-node circle, .gz-node rect, .gz-node polygon { transition: stroke-width 0.2s, filter 0.2s, opacity 0.3s; }
+        .gz-edge { transition: stroke-width 0.3s, opacity 0.3s; }
+        .gz-dimmed { opacity: 0.1 !important; }
+        .gz-highlighted circle, .gz-highlighted rect, .gz-highlighted polygon { stroke-width: 3.5px !important; filter: drop-shadow(0 0 5px rgba(0,0,0,0.3)); }
+        .gz-highlighted-cell rect { stroke-width: 3px !important; filter: drop-shadow(0 0 4px rgba(0,0,0,0.25)); }
+        .gz-edge.gz-highlighted { stroke-width: 3.5px !important; opacity: 1 !important; }
+        .gz-tooltip {
+            position: fixed; background: #333; color: white;
+            padding: 8px 14px; border-radius: 6px; font-size: 0.82em;
+            pointer-events: none; opacity: 0; transition: opacity 0.15s;
+            z-index: 1000; max-width: 300px; line-height: 1.4;
+        }
+        .gz-tooltip.visible { opacity: 1; }
+        .gz-legend { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 10px; gap: 4px 14px; }
+        .gz-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.72em; color: #666; }
+        .gz-legend-dot { width: 11px; height: 11px; border-radius: 50%; }
+        .gz-legend-line { width: 16px; height: 3px; border-radius: 2px; }
+        .gz-instructions { text-align: center; color: #999; font-size: 0.78em; margin-top: 10px; font-style: italic; }
+        .gz-belief-bar {
+            display: flex; align-items: center; gap: 6px;
+            margin: 3px 0; font-size: 0.75em; color: #555; width: 100%;
+        }
+        .gz-belief-bar-label { width: 70px; text-align: right; font-weight: 600; font-size: 0.85em; }
+        .gz-belief-bar-track { flex: 1; height: 10px; background: #eee; border-radius: 5px; overflow: hidden; }
+        .gz-belief-bar-fill { height: 100%; border-radius: 5px; transition: width 0.3s; }
+        .gz-belief-bar-val { width: 32px; font-size: 0.85em; font-weight: 600; }
+        .gz-threshold-line {
+            border-top: 2px dashed #e74c3c; margin: 8px 0 4px;
+            position: relative; width: 100%;
+        }
+        .gz-threshold-label { font-size: 0.65em; color: #e74c3c; text-align: center; font-weight: 600; }
+        .gz-demo-btn {
+            display: block; margin: 10px auto 0; padding: 6px 16px;
+            background: #5b6abf; color: white; border: none; border-radius: 6px;
+            font-size: 0.8em; cursor: pointer; font-weight: 600;
+        }
+        .gz-demo-btn:hover { background: #4a5aae; }
+        .gz-demo-btn.active { background: #e63946; }
+        .gz-tau-note { font-size: 0.68em; color: #999; margin-top: 2px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="gz-container">
+    <div class="gz-title">How GammaZero Converts a Belief State to a Graph</div>
+    <p class="gz-subtitle">RockSample(5,3): Hover over grid cells or graph nodes to see belief-driven connections</p>
+
+    <div class="gz-layout">
+        <!-- LEFT: Belief State Panel -->
+        <div class="gz-belief-panel">
+            <h4>Belief State (Particles)</h4>
+            <svg id="gz-grid-svg" width="190" height="190" viewBox="0 0 190 190">
+                <!-- 5x5 Grid -->
+                <defs>
+                    <pattern id="grid-pattern" width="36" height="36" patternUnits="userSpaceOnUse">
+                        <rect width="36" height="36" fill="none" stroke="#ddd" stroke-width="0.5"/>
+                    </pattern>
+                </defs>
+                <rect x="5" y="5" width="180" height="180" fill="url(#grid-pattern)" stroke="#bbb" stroke-width="1" rx="3"/>
+
+                <!-- Grid coordinates (0-4) -->
+                <text x="23" y="198" font-size="7" fill="#aaa" text-anchor="middle">0</text>
+                <text x="59" y="198" font-size="7" fill="#aaa" text-anchor="middle">1</text>
+                <text x="95" y="198" font-size="7" fill="#aaa" text-anchor="middle">2</text>
+                <text x="131" y="198" font-size="7" fill="#aaa" text-anchor="middle">3</text>
+                <text x="167" y="198" font-size="7" fill="#aaa" text-anchor="middle">4</text>
+
+                <!-- Exit region (right edge) -->
+                <rect x="169" y="5" width="16" height="180" fill="#e8f5e9" opacity="0.5" rx="2"/>
+                <text x="177" y="98" font-size="7" fill="#2e7d32" text-anchor="middle" transform="rotate(-90, 177, 98)">EXIT</text>
+
+                <!-- Rock R1 at (1,2) - uncertain -->
+                <g class="gz-grid-cell" data-hover="rock-R1">
+                    <rect x="42" y="77" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/>
+                    <polygon points="59,82 67,96 51,96" fill="#9e9e9e" stroke="#616161" stroke-width="1.5" opacity="0.6"/>
+                    <text x="59" y="108" text-anchor="middle" font-size="7.5" font-weight="700" fill="#555">R1</text>
+                    <text x="59" y="116" text-anchor="middle" font-size="6" fill="#e74c3c">?</text>
+                </g>
+
+                <!-- Rock R2 at (3,1) - likely good -->
+                <g class="gz-grid-cell" data-hover="rock-R2">
+                    <rect x="114" y="41" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/>
+                    <polygon points="131,46 139,60 123,60" fill="#81c784" stroke="#388e3c" stroke-width="1.5" opacity="0.85"/>
+                    <text x="131" y="72" text-anchor="middle" font-size="7.5" font-weight="700" fill="#555">R2</text>
+                    <text x="131" y="80" text-anchor="middle" font-size="6" fill="#388e3c">75%</text>
+                </g>
+
+                <!-- Rock R3 at (2,3) - high confidence good -->
+                <g class="gz-grid-cell" data-hover="rock-R3">
+                    <rect x="78" y="113" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/>
+                    <polygon points="95,118 103,132 87,132" fill="#4caf50" stroke="#2e7d32" stroke-width="1.5" opacity="0.95"/>
+                    <text x="95" y="144" text-anchor="middle" font-size="7.5" font-weight="700" fill="#555">R3</text>
+                    <text x="95" y="152" text-anchor="middle" font-size="6" fill="#2e7d32">90%</text>
+                </g>
+
+                <!-- Robot at (0,2) -->
+                <g class="gz-grid-cell" data-hover="robot">
+                    <rect x="6" y="77" width="34" height="34" rx="4" fill="none" stroke="transparent" stroke-width="2"/>
+                    <circle cx="23" cy="94" r="12" fill="#42a5f5" stroke="#1565c0" stroke-width="2"/>
+                    <text x="23" y="98" text-anchor="middle" font-size="8" font-weight="700" fill="white">R</text>
+                </g>
+            </svg>
+
+            <h4 style="margin-top: 10px;">Belief Probabilities</h4>
+            <div style="width: 100%; padding: 0 5px;">
+                <div class="gz-belief-bar" data-belief="robot-pos">
+                    <span class="gz-belief-bar-label">At(Robot)</span>
+                    <div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:100%; background:#42a5f5;"></div></div>
+                    <span class="gz-belief-bar-val">1.0</span>
+                </div>
+                <div class="gz-belief-bar" data-belief="R3-good">
+                    <span class="gz-belief-bar-label">IsGood(R3)</span>
+                    <div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:90%; background:#4caf50;"></div></div>
+                    <span class="gz-belief-bar-val">0.90</span>
+                </div>
+                <div class="gz-belief-bar" data-belief="R2-good">
+                    <span class="gz-belief-bar-label">IsGood(R2)</span>
+                    <div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:75%; background:#81c784;"></div></div>
+                    <span class="gz-belief-bar-val">0.75</span>
+                </div>
+                <div class="gz-threshold-line"></div>
+                <div class="gz-threshold-label">threshold tau = 0.3</div>
+                <div class="gz-belief-bar" data-belief="R1-good">
+                    <span class="gz-belief-bar-label">IsGood(R1)</span>
+                    <div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:40%; background:#9e9e9e;"></div></div>
+                    <span class="gz-belief-bar-val">0.40</span>
+                </div>
+                <div class="gz-belief-bar" data-belief="R1-bad">
+                    <span class="gz-belief-bar-label">IsBad(R1)</span>
+                    <div class="gz-belief-bar-track"><div class="gz-belief-bar-fill" style="width:60%; background:#ef9a9a;"></div></div>
+                    <span class="gz-belief-bar-val">0.60</span>
+                </div>
+            </div>
+            <p class="gz-tau-note">Attributes above tau become graph nodes</p>
+        </div>
+
+        <div class="gz-arrow">&#8594;</div>
+
+        <!-- RIGHT: Graph Panel -->
+        <div class="gz-graph-panel">
+            <h4>Uncertainty-Aware Belief Graph</h4>
+            <svg id="gz-graph-svg" width="100%" viewBox="0 0 620 340" style="max-height: 340px;">
+                <!-- EDGES -->
+                <!-- Action-Object edges (solid blue) -->
+                <line class="gz-edge" data-edge="action-obj" data-connects="check_R1 R1" x1="105" y1="55" x2="155" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                <line class="gz-edge" data-edge="action-obj" data-connects="check_R2 R2" x1="235" y1="55" x2="275" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                <line class="gz-edge" data-edge="action-obj" data-connects="sample_R3 R3" x1="365" y1="55" x2="395" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                <line class="gz-edge" data-edge="action-obj" data-connects="move_east robot" x1="500" y1="55" x2="515" y2="135" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+
+                <!-- Attribute-Object edges (belief-weighted, dashed) -->
+                <line class="gz-edge" data-edge="attr-obj" data-connects="isgood_R1 R1" x1="90" y1="250" x2="155" y2="170" stroke="#ff9800" stroke-width="1.8" opacity="0.45" stroke-dasharray="4,3"/>
+                <line class="gz-edge" data-edge="attr-obj" data-connects="isbad_R1 R1" x1="200" y1="250" x2="155" y2="170" stroke="#ff9800" stroke-width="1.8" opacity="0.55" stroke-dasharray="4,3"/>
+                <line class="gz-edge" data-edge="attr-obj" data-connects="isgood_R2 R2" x1="320" y1="250" x2="275" y2="170" stroke="#ff9800" stroke-width="2.2" opacity="0.7" stroke-dasharray="4,3"/>
+                <line class="gz-edge" data-edge="attr-obj" data-connects="isgood_R3 R3" x1="440" y1="250" x2="395" y2="170" stroke="#ff9800" stroke-width="2.5" opacity="0.85" stroke-dasharray="4,3"/>
+                <line class="gz-edge" data-edge="attr-obj" data-connects="at_robot robot" x1="560" y1="250" x2="515" y2="170" stroke="#ff9800" stroke-width="2.8" opacity="0.95" stroke-dasharray="4,3"/>
+
+                <!-- Attribute-Action edges (dotted purple) -->
+                <line class="gz-edge" data-edge="attr-act" data-connects="isgood_R1 check_R1" x1="90" y1="240" x2="105" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                <line class="gz-edge" data-edge="attr-act" data-connects="isgood_R2 check_R2" x1="320" y1="240" x2="235" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                <line class="gz-edge" data-edge="attr-act" data-connects="isgood_R3 sample_R3" x1="440" y1="240" x2="365" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+                <line class="gz-edge" data-edge="attr-act" data-connects="at_robot move_east" x1="560" y1="240" x2="500" y2="70" stroke="#9c27b0" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,4"/>
+
+                <!-- Global node edges (thin gray) -->
+                <line class="gz-edge" data-edge="global" data-connects="global R1" x1="330" y1="320" x2="155" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                <line class="gz-edge" data-edge="global" data-connects="global R2" x1="330" y1="320" x2="275" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                <line class="gz-edge" data-edge="global" data-connects="global R3" x1="330" y1="320" x2="395" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+                <line class="gz-edge" data-edge="global" data-connects="global robot" x1="330" y1="320" x2="515" y2="170" stroke="#999" stroke-width="1" opacity="0.25"/>
+
+                <!-- ACTION NODES (blue-purple rectangles, top row) -->
+                <g class="gz-node" data-ntype="action" data-id="check_R1" data-tip="Check(R1): Observe rock R1's quality with distance-dependent accuracy. Connected to R1 and IsGood(R1).">
+                    <rect x="50" y="25" width="110" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/>
+                    <text x="105" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">Check(R1)</text>
+                </g>
+                <g class="gz-node" data-ntype="action" data-id="check_R2" data-tip="Check(R2): Observe rock R2's quality. High accuracy due to proximity. Connected to R2 and IsGood(R2).">
+                    <rect x="180" y="25" width="110" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/>
+                    <text x="235" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">Check(R2)</text>
+                </g>
+                <g class="gz-node" data-ntype="action" data-id="sample_R3" data-tip="Sample(R3): Collect rock R3. Requires co-location. Reward depends on IsGood(R3) belief (0.90). Connected to R3 and IsGood(R3).">
+                    <rect x="310" y="25" width="110" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/>
+                    <text x="365" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">Sample(R3)</text>
+                </g>
+                <g class="gz-node" data-ntype="action" data-id="move_east" data-tip="MoveEast: Move robot one cell to the right. Connected to Robot and At(Robot) attribute. Toward exit.">
+                    <rect x="440" y="25" width="120" height="36" rx="6" fill="#5b6abf" stroke="#3d4a9e" stroke-width="2"/>
+                    <text x="500" y="48" text-anchor="middle" font-size="11.5" fill="white" font-weight="700">MoveEast</text>
+                </g>
+
+                <!-- OBJECT NODES (middle row, colored circles) -->
+                <g class="gz-node" data-ntype="object" data-id="R1" data-tip="Rock R1 at (1,2): Quality uncertain (40% good, 60% bad). Connected to Check(R1), IsGood(R1), IsBad(R1).">
+                    <circle cx="155" cy="150" r="24" fill="#e8e8e8" stroke="#757575" stroke-width="2.5"/>
+                    <polygon points="155,133 165,147 145,147" fill="#9e9e9e" stroke="#616161" stroke-width="1"/>
+                    <text x="155" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#555">R1</text>
+                </g>
+                <g class="gz-node" data-ntype="object" data-id="R2" data-tip="Rock R2 at (3,1): Likely good (75% belief). Connected to Check(R2) and IsGood(R2).">
+                    <circle cx="275" cy="150" r="24" fill="#c8e6c9" stroke="#388e3c" stroke-width="2.5"/>
+                    <polygon points="275,133 285,147 265,147" fill="#81c784" stroke="#388e3c" stroke-width="1"/>
+                    <text x="275" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#2e7d32">R2</text>
+                </g>
+                <g class="gz-node" data-ntype="object" data-id="R3" data-tip="Rock R3 at (2,3): High confidence good (90%). Connected to Sample(R3) and IsGood(R3).">
+                    <circle cx="395" cy="150" r="24" fill="#a5d6a7" stroke="#2e7d32" stroke-width="2.5"/>
+                    <polygon points="395,133 405,147 385,147" fill="#4caf50" stroke="#2e7d32" stroke-width="1"/>
+                    <text x="395" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#1b5e20">R3</text>
+                </g>
+                <g class="gz-node" data-ntype="object" data-id="robot" data-tip="Robot at position (0,2): Position known with certainty (belief=1.0). Connected to MoveEast and At(Robot).">
+                    <circle cx="515" cy="150" r="24" fill="#bbdefb" stroke="#1565c0" stroke-width="2.5"/>
+                    <text x="515" y="155" text-anchor="middle" font-size="11" font-weight="700" fill="#1565c0">Bot</text>
+                </g>
+
+                <!-- ATTRIBUTE INSTANCE NODES (bottom row, rounded rects with belief opacity) -->
+                <g class="gz-node" data-ntype="attribute" data-id="isgood_R1" data-tip="IsGood(R1): Belief probability 0.40. Node exists because 0.40 > tau(0.30). Edge weight encodes uncertainty.">
+                    <rect x="35" y="230" width="110" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.5"/>
+                    <text x="90" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsGood(R1) 0.40</text>
+                </g>
+                <g class="gz-node" data-ntype="attribute" data-id="isbad_R1" data-tip="IsBad(R1): Belief probability 0.60. Complementary to IsGood(R1). Both exist since both > tau.">
+                    <rect x="155" y="230" width="100" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.65"/>
+                    <text x="205" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsBad(R1) 0.60</text>
+                </g>
+                <g class="gz-node" data-ntype="attribute" data-id="isgood_R2" data-tip="IsGood(R2): Belief probability 0.75. Strong particle support. Edge thickness reflects confidence.">
+                    <rect x="268" y="230" width="110" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.8"/>
+                    <text x="323" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsGood(R2) 0.75</text>
+                </g>
+                <g class="gz-node" data-ntype="attribute" data-id="isgood_R3" data-tip="IsGood(R3): Belief probability 0.90. Near-unanimous particle support. High confidence enables sampling.">
+                    <rect x="390" y="230" width="108" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="0.92"/>
+                    <text x="444" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">IsGood(R3) 0.90</text>
+                </g>
+                <g class="gz-node" data-ntype="attribute" data-id="at_robot" data-tip="At(Robot)=(0,2): Position known with certainty (1.0). Unanimous particle support. Enables MoveEast action.">
+                    <rect x="510" y="230" width="105" height="30" rx="15" fill="#ff9800" stroke="#e65100" stroke-width="1.5" opacity="1.0"/>
+                    <text x="562" y="249" text-anchor="middle" font-size="9.5" fill="white" font-weight="600">At(Bot) 1.00</text>
+                </g>
+
+                <!-- GLOBAL NODE (diamond at bottom center) -->
+                <g class="gz-node" data-ntype="global" data-id="global" data-tip="Global aggregation node: Maintains holistic belief representation. Connects to all object nodes, enabling rapid information propagation across the graph.">
+                    <polygon points="330,300 350,320 330,340 310,320" fill="#78909c" stroke="#455a64" stroke-width="2"/>
+                    <text x="330" y="324" text-anchor="middle" font-size="8" font-weight="700" fill="white">G</text>
+                </g>
+
+                <!-- Belief strength indicators on edges -->
+                <text x="110" y="160" font-size="7" fill="#ff9800" opacity="0.7">0.40</text>
+                <text x="288" y="215" font-size="7" fill="#ff9800" opacity="0.8">0.75</text>
+                <text x="425" y="215" font-size="7" fill="#ff9800" opacity="0.9">0.90</text>
+                <text x="545" y="215" font-size="7" fill="#ff9800" opacity="1.0">1.00</text>
+            </svg>
+
+            <div class="gz-legend">
+                <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#5b6abf;"></div>Action node</div>
+                <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#c8e6c9;border:2px solid #388e3c;"></div>Object node</div>
+                <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#ff9800;border-radius:3px;"></div>Attribute (belief-weighted)</div>
+                <div class="gz-legend-item"><div class="gz-legend-dot" style="background:#78909c;transform:rotate(45deg);border-radius:2px;"></div>Global node</div>
+                <div class="gz-legend-item"><div class="gz-legend-line" style="background:#5b6abf;"></div>Action-object edge</div>
+                <div class="gz-legend-item"><div class="gz-legend-line" style="background:#ff9800;border-top:2px dashed #ff9800;height:0;"></div>Attribute-object edge</div>
+                <div class="gz-legend-item"><div class="gz-legend-line" style="background:#9c27b0;border-top:2px dotted #9c27b0;height:0;"></div>Attribute-action edge</div>
+            </div>
+        </div>
+    </div>
+
+    <p class="gz-instructions">Hover over grid cells (left) or graph nodes (right) to see belief-driven connections. Node opacity reflects belief strength.</p>
+    <button class="gz-demo-btn" id="gz-demo-btn">Auto Demo (for video recording)</button>
+</div>
+
+<div class="gz-tooltip" id="gz-tooltip"></div>
+
+<script>
+(function() {
+    var tooltip = document.getElementById('gz-tooltip');
+    var allNodes = document.querySelectorAll('.gz-node');
+    var allEdges = document.querySelectorAll('.gz-edge');
+    var allCells = document.querySelectorAll('.gz-grid-cell');
+
+    // Mapping: grid cells -> graph elements
+    var cellMap = {
+        'robot': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: true },
+        'rock-R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1', 'isbad_R1'], global: false },
+        'rock-R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: false },
+        'rock-R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: false }
+    };
+
+    // Mapping: graph nodes -> related elements
+    var nodeMap = {
+        'check_R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1'], global: false },
+        'check_R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: false },
+        'sample_R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: false },
+        'move_east': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: false },
+        'R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1', 'isbad_R1'], global: true },
+        'R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: true },
+        'R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: true },
+        'robot': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: true },
+        'isgood_R1': { objects: ['R1'], actions: ['check_R1'], attrs: ['isgood_R1'], global: false },
+        'isbad_R1': { objects: ['R1'], actions: [], attrs: ['isbad_R1'], global: false },
+        'isgood_R2': { objects: ['R2'], actions: ['check_R2'], attrs: ['isgood_R2'], global: false },
+        'isgood_R3': { objects: ['R3'], actions: ['sample_R3'], attrs: ['isgood_R3'], global: false },
+        'at_robot': { objects: ['robot'], actions: ['move_east'], attrs: ['at_robot'], global: false },
+        'global': { objects: ['R1', 'R2', 'R3', 'robot'], actions: [], attrs: [], global: true }
+    };
+
+    function showTip(e, t) { tooltip.textContent = t; tooltip.classList.add('visible'); moveTip(e); }
+    function moveTip(e) { tooltip.style.left = (e.clientX + 14) + 'px'; tooltip.style.top = (e.clientY - 10) + 'px'; }
+    function hideTip() { tooltip.classList.remove('visible'); }
+
+    function highlight(m) {
+        allNodes.forEach(function(n) { n.classList.add('gz-dimmed'); });
+        allEdges.forEach(function(e) { e.classList.add('gz-dimmed'); });
+        allCells.forEach(function(c) { c.classList.add('gz-dimmed'); });
+
+        // Highlight matching objects
+        m.objects.forEach(function(id) {
+            document.querySelectorAll('.gz-node[data-id="'+id+'"]').forEach(function(n) {
+                n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted');
+            });
+            // Highlight corresponding grid cells
+            allCells.forEach(function(c) {
+                var key = c.dataset.hover;
+                if ((key === 'robot' && id === 'robot') ||
+                    (key === 'rock-R1' && id === 'R1') ||
+                    (key === 'rock-R2' && id === 'R2') ||
+                    (key === 'rock-R3' && id === 'R3')) {
+                    c.classList.remove('gz-dimmed'); c.classList.add('gz-highlighted-cell');
+                }
+            });
+        });
+        // Highlight matching actions
+        m.actions.forEach(function(id) {
+            document.querySelectorAll('.gz-node[data-id="'+id+'"]').forEach(function(n) {
+                n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted');
+            });
+        });
+        // Highlight matching attributes
+        m.attrs.forEach(function(id) {
+            document.querySelectorAll('.gz-node[data-id="'+id+'"]').forEach(function(n) {
+                n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted');
+            });
+        });
+        // Highlight global node
+        if (m.global) {
+            document.querySelectorAll('.gz-node[data-id="global"]').forEach(function(n) {
+                n.classList.remove('gz-dimmed'); n.classList.add('gz-highlighted');
+            });
+        }
+        // Highlight matching edges
+        allEdges.forEach(function(edge) {
+            var parts = edge.dataset.connects.split(' ');
+            var src = parts[0], tgt = parts[1];
+            var edgeType = edge.dataset.edge;
+            var h = false;
+            if (edgeType === 'action-obj') {
+                if (m.actions.indexOf(src) >= 0 && m.objects.indexOf(tgt) >= 0) h = true;
+            } else if (edgeType === 'attr-obj') {
+                if (m.attrs.indexOf(src) >= 0 && m.objects.indexOf(tgt) >= 0) h = true;
+            } else if (edgeType === 'attr-act') {
+                if (m.attrs.indexOf(src) >= 0 && m.actions.indexOf(tgt) >= 0) h = true;
+            } else if (edgeType === 'global') {
+                if (m.global && m.objects.indexOf(tgt) >= 0) h = true;
+            }
+            if (h) { edge.classList.remove('gz-dimmed'); edge.classList.add('gz-highlighted'); }
+        });
+    }
+
+    function clearAll() {
+        allNodes.forEach(function(n) { n.classList.remove('gz-dimmed', 'gz-highlighted'); });
+        allEdges.forEach(function(e) { e.classList.remove('gz-dimmed', 'gz-highlighted'); });
+        allCells.forEach(function(c) { c.classList.remove('gz-dimmed', 'gz-highlighted-cell'); });
+    }
+
+    // Grid cell hover events
+    allCells.forEach(function(cell) {
+        var key = cell.dataset.hover;
+        cell.addEventListener('mouseenter', function(e) {
+            var m = cellMap[key];
+            if (m) highlight(m);
+            var tips = {
+                'robot': 'Robot at (0,2): position known (belief=1.0). See At(Bot) attribute and MoveEast action.',
+                'rock-R1': 'Rock R1 at (1,2): uncertain quality (40% good). See IsGood/IsBad attributes and Check action.',
+                'rock-R2': 'Rock R2 at (3,1): likely good (75%). See IsGood attribute and Check action.',
+                'rock-R3': 'Rock R3 at (2,3): high confidence good (90%). See IsGood attribute and Sample action.'
+            };
+            showTip(e, tips[key] || key);
+        });
+        cell.addEventListener('mousemove', moveTip);
+        cell.addEventListener('mouseleave', function() { clearAll(); hideTip(); });
+    });
+
+    // Graph node hover events
+    allNodes.forEach(function(node) {
+        var id = node.dataset.id;
+        node.addEventListener('mouseenter', function(e) {
+            var m = nodeMap[id];
+            if (m) highlight(m);
+            showTip(e, node.dataset.tip);
+        });
+        node.addEventListener('mousemove', moveTip);
+        node.addEventListener('mouseleave', function() { clearAll(); hideTip(); });
+    });
+
+    // Auto demo
+    var demoInterval = null, demoStep = 0;
+    var demoSeq = [
+        { type: 'cell', key: 'robot', pause: 2500, label: 'Robot position (known)' },
+        { type: 'clear', pause: 600 },
+        { type: 'cell', key: 'rock-R1', pause: 2500, label: 'Rock R1 (uncertain: 40% good)' },
+        { type: 'clear', pause: 600 },
+        { type: 'cell', key: 'rock-R2', pause: 2500, label: 'Rock R2 (likely good: 75%)' },
+        { type: 'clear', pause: 600 },
+        { type: 'cell', key: 'rock-R3', pause: 2500, label: 'Rock R3 (confident: 90%)' },
+        { type: 'clear', pause: 600 },
+        { type: 'node', key: 'check_R1', pause: 2500, label: 'Check action for uncertain rock' },
+        { type: 'clear', pause: 600 },
+        { type: 'node', key: 'sample_R3', pause: 2500, label: 'Sample action for confident rock' },
+        { type: 'clear', pause: 600 },
+        { type: 'node', key: 'isgood_R1', pause: 2500, label: 'Low-confidence attribute (0.40)' },
+        { type: 'clear', pause: 600 },
+        { type: 'node', key: 'isgood_R3', pause: 2500, label: 'High-confidence attribute (0.90)' },
+        { type: 'clear', pause: 600 },
+        { type: 'node', key: 'global', pause: 2500, label: 'Global node aggregates all info' },
+        { type: 'clear', pause: 1000 }
+    ];
+    var demoBtn = document.getElementById('gz-demo-btn');
+    var demoTimeout = null;
+
+    function stopDemo() {
+        if (demoTimeout) clearTimeout(demoTimeout);
+        demoTimeout = null;
+        demoStep = 0;
+        demoBtn.textContent = 'Auto Demo (for video recording)';
+        demoBtn.classList.remove('active');
+        clearAll();
+    }
+
+    function runDemoStep() {
+        if (demoStep >= demoSeq.length) { demoStep = 0; }
+        var step = demoSeq[demoStep];
+        clearAll();
+        if (step.type === 'cell') {
+            var m = cellMap[step.key];
+            if (m) highlight(m);
+        } else if (step.type === 'node') {
+            var m2 = nodeMap[step.key];
+            if (m2) highlight(m2);
+        }
+        demoStep++;
+        demoTimeout = setTimeout(runDemoStep, step.pause);
+    }
+
+    demoBtn.addEventListener('click', function() {
+        if (demoTimeout) {
+            stopDemo();
+        } else {
+            demoStep = 0;
+            demoBtn.textContent = 'Stop Demo';
+            demoBtn.classList.add('active');
+            runDemoStep();
+        }
+    });
+})();
+</script>
+</body>
+</html>
