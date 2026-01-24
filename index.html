@@ -264,6 +264,33 @@
         .gz-arrow { transform: rotate(90deg); }
     }
 
+    /* MCTS Comparison Styles */
+    .mcts-embed { display: flex; gap: 14px; margin: 20px 0; flex-wrap: wrap; justify-content: center; }
+    .mcts-embed-panel {
+        background: #fafafa; border-radius: 10px; padding: 14px; flex: 1; min-width: 380px; max-width: 480px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+    .mcts-embed-panel h4 { text-align: center; font-size: 0.8em; font-weight: 700; margin-bottom: 8px; padding: 4px 10px; border-radius: 4px; }
+    .mcts-embed-panel.baseline h4 { background: #ffebee; color: #c62828; }
+    .mcts-embed-panel.guided h4 { background: #e8f5e9; color: #2e7d32; }
+    .mcts-embed-caption { text-align: center; font-size: 0.78em; color: #666; margin-top: 10px; padding: 8px 14px; background: #f8f9ff; border-radius: 5px; border: 1px solid #eee; }
+    @media (max-width: 850px) { .mcts-embed { flex-direction: column; align-items: center; } .mcts-embed-panel { min-width: unset; width: 100%; } }
+
+    /* Domain Gallery Styles */
+    .domain-gallery-embed { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    @media (max-width: 700px) { .domain-gallery-embed { grid-template-columns: 1fr; } }
+    .domain-card-embed {
+        background: #fafafa; border-radius: 8px; padding: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .domain-card-embed .domain-header-e { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .domain-card-embed .domain-icon-e { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7em; font-weight: 700; color: white; }
+    .domain-card-embed .domain-name-e { font-size: 0.85em; font-weight: 700; color: #333; }
+    .domain-card-embed .domain-desc-e { font-size: 0.72em; color: #666; line-height: 1.3; margin-bottom: 6px; }
+    .domain-card-embed .domain-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .domain-card-embed .domain-tag { font-size: 0.62em; padding: 2px 6px; border-radius: 8px; background: #f0f0f0; color: #555; font-weight: 600; }
+    .domain-card-embed .domain-tag.hl { background: #e8f5e9; color: #2e7d32; }
+
   </style>
 </head>
 <body>
@@ -639,6 +666,72 @@
                 </div>
             </div>
 
+            <!-- Embedded MCTS Comparison -->
+            <div class="mcts-embed">
+                <div class="mcts-embed-panel baseline">
+                    <h4>Standard MCTS (No Guidance)</h4>
+                    <svg width="100%" viewBox="0 0 400 220">
+                        <g><circle cx="200" cy="28" r="15" fill="#78909c" stroke="#455a64" stroke-width="2"/><text x="200" y="33" text-anchor="middle" font-size="8" fill="white" font-weight="700">b₀</text></g>
+                        <line x1="200" y1="43" x2="60" y2="85" stroke="#999" stroke-width="2"/><text x="115" y="60" font-size="7" fill="#888">MoveN</text>
+                        <line x1="200" y1="43" x2="140" y2="85" stroke="#999" stroke-width="2"/><text x="160" y="65" font-size="7" fill="#888">MoveS</text>
+                        <line x1="200" y1="43" x2="220" y2="85" stroke="#999" stroke-width="2"/><text x="218" y="63" font-size="7" fill="#888">Check</text>
+                        <line x1="200" y1="43" x2="290" y2="85" stroke="#999" stroke-width="2"/><text x="258" y="60" font-size="7" fill="#888">MoveE</text>
+                        <line x1="200" y1="43" x2="360" y2="85" stroke="#999" stroke-width="2"/><text x="300" y="55" font-size="7" fill="#888">Samp</text>
+                        <circle cx="60" cy="95" r="11" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/><text x="60" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="140" cy="95" r="11" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/><text x="140" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="220" cy="95" r="11" fill="#a5d6a7" stroke="#388e3c" stroke-width="1.5"/><text x="220" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="290" cy="95" r="11" fill="#bcaaa4" stroke="#795548" stroke-width="1.5"/><text x="290" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <circle cx="360" cy="95" r="11" fill="#ef9a9a" stroke="#c62828" stroke-width="1.5"/><text x="360" y="112" text-anchor="middle" font-size="6" fill="#666">N=4</text>
+                        <line x1="60" y1="106" x2="40" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="60" y1="106" x2="80" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="140" y1="106" x2="125" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="140" y1="106" x2="155" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="220" y1="106" x2="205" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <line x1="220" y1="106" x2="235" y2="140" stroke="#ccc" stroke-width="1.2"/>
+                        <circle cx="40" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="40" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="80" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="80" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="125" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="125" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="155" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="155" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="205" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="205" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <circle cx="235" cy="148" r="7" fill="#e0e0e0" stroke="#999"/><text x="235" y="165" text-anchor="middle" font-size="7" fill="#e74c3c">?</text>
+                        <text x="200" y="190" text-anchor="middle" font-size="8" fill="#c62828" font-weight="600">Budget spread uniformly, expensive rollouts (?)</text>
+                        <text x="200" y="205" text-anchor="middle" font-size="7.5" fill="#888">Shallow depth, poor value estimates</text>
+                    </svg>
+                </div>
+                <div class="mcts-embed-panel guided">
+                    <h4>GammaZero-Guided MCTS</h4>
+                    <svg width="100%" viewBox="0 0 400 220">
+                        <rect x="70" y="2" width="260" height="14" rx="3" fill="#e8f5e9" stroke="#c8e6c9"/>
+                        <text x="200" y="12" text-anchor="middle" font-size="6.5" fill="#2e7d32" font-weight="600">P(a|G): Check=0.45, MoveE=0.25, Check(R1)=0.20, other=0.10</text>
+                        <g><circle cx="200" cy="32" r="15" fill="#78909c" stroke="#455a64" stroke-width="2"/><text x="200" y="37" text-anchor="middle" font-size="8" fill="white" font-weight="700">b₀</text></g>
+                        <line x1="200" y1="47" x2="130" y2="85" stroke="#2e7d32" stroke-width="4.5" opacity="0.8"/>
+                        <text x="152" y="62" font-size="7.5" fill="#2e7d32" font-weight="700">Check(R2)</text>
+                        <line x1="200" y1="47" x2="260" y2="85" stroke="#5b6abf" stroke-width="2.5" opacity="0.6"/>
+                        <text x="242" y="63" font-size="7" fill="#5b6abf">MoveE</text>
+                        <line x1="200" y1="47" x2="340" y2="85" stroke="#ff9800" stroke-width="1.5" opacity="0.4"/>
+                        <text x="285" y="58" font-size="6.5" fill="#ff9800">Check(R1)</text>
+                        <line x1="200" y1="47" x2="80" y2="75" stroke="#ddd" stroke-width="1" stroke-dasharray="3,2"/>
+                        <text x="125" y="77" font-size="6" fill="#ccc">pruned</text>
+                        <circle cx="80" cy="82" r="6" fill="#f5f5f5" stroke="#ddd"/>
+                        <circle cx="130" cy="97" r="13" fill="#66bb6a" stroke="#2e7d32" stroke-width="2"/><text x="130" y="101" text-anchor="middle" font-size="7.5" fill="white" font-weight="700">b₁</text><text x="130" y="116" text-anchor="middle" font-size="6" fill="#2e7d32" font-weight="600">N=12</text>
+                        <circle cx="260" cy="97" r="11" fill="#90caf9" stroke="#1565c0" stroke-width="1.5"/><text x="260" y="101" text-anchor="middle" font-size="7" fill="white">b₂</text><text x="260" y="115" text-anchor="middle" font-size="6" fill="#666">N=5</text>
+                        <circle cx="340" cy="97" r="9" fill="#ffe0b2" stroke="#e65100" stroke-width="1.5"/><text x="340" y="101" text-anchor="middle" font-size="6.5" fill="#5d4037">b₃</text><text x="340" y="113" text-anchor="middle" font-size="6" fill="#666">N=2</text>
+                        <line x1="130" y1="110" x2="100" y2="145" stroke="#2e7d32" stroke-width="3" opacity="0.7"/>
+                        <line x1="130" y1="110" x2="165" y2="145" stroke="#999" stroke-width="1.5" opacity="0.4"/>
+                        <text x="107" y="130" font-size="6" fill="#2e7d32">obs:good</text>
+                        <circle cx="100" cy="155" r="11" fill="#43a047" stroke="#1b5e20" stroke-width="2"/><text x="100" y="159" text-anchor="middle" font-size="7" fill="white">b₄</text>
+                        <circle cx="165" cy="155" r="8" fill="#fff9c4" stroke="#f9a825" stroke-width="1.5"/>
+                        <line x1="100" y1="166" x2="85" y2="190" stroke="#2e7d32" stroke-width="2" opacity="0.6"/>
+                        <text x="85" y="185" font-size="6" fill="#2e7d32">Sample</text>
+                        <circle cx="85" cy="198" r="9" fill="#2e7d32" stroke="#1b5e20" stroke-width="1.5"/><text x="85" y="202" text-anchor="middle" font-size="6" fill="white">b₅</text>
+                        <rect x="65" y="208" width="40" height="11" rx="2" fill="#1b5e20"/><text x="85" y="216" text-anchor="middle" font-size="6" fill="white" font-weight="600">V=18.5</text>
+                        <rect x="240" y="113" width="38" height="11" rx="2" fill="#78909c"/><text x="259" y="121" text-anchor="middle" font-size="6" fill="white">V=12.3</text>
+                        <rect x="322" y="113" width="34" height="11" rx="2" fill="#ff9800" opacity="0.8"/><text x="339" y="121" text-anchor="middle" font-size="6" fill="white">V=7.4</text>
+                    </svg>
+                </div>
+            </div>
+            <p class="mcts-embed-caption"><b>Left:</b> Standard MCTS spreads budget uniformly across all actions with expensive rollouts. <b>Right:</b> GammaZero's P(a|G) focuses 60% of visits on the best action, discovers the 3-step Check→Sample→Move sequence, and V(G) provides instant leaf evaluation.</p>
+
             <img src="./resources/gz_overview.png" alt="GammaZero Framework Overview" class="visible-image" style="width: 90%;">
             <hr>
         </div>
@@ -945,6 +1038,91 @@
                     <p><b>LightDark:</b> 1D localization with noisy observations improving near "light" region. <b>RockSample(n,k):</b> Information gathering on n×n grid with k rocks of unknown quality. <b>MultiObjectSearch(n,k):</b> Target localization finding k hidden objects on n×n grid. <b>Rearrangement(n,k):</b> Mobile manipulation transporting k objects with unknown positions to goal locations.</p>
                 </div>
             </div>
+
+            <!-- Embedded Domain Gallery -->
+            <div class="domain-gallery-embed">
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#1a237e,#ffd54f);">LD</div><span class="domain-name-e">LightDark</span></div>
+                    <p class="domain-desc-e">1D localization under position uncertainty. Observations improve near "light" region. Must gather information before committing to goal.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <defs><linearGradient id="ld-g" x1="0%" x2="100%"><stop offset="0%" style="stop-color:#1a237e;stop-opacity:0.7"/><stop offset="55%" style="stop-color:#ffd54f;stop-opacity:0.4"/><stop offset="100%" style="stop-color:#1a237e;stop-opacity:0.4"/></linearGradient></defs>
+                        <rect x="5" y="18" width="120" height="20" rx="3" fill="url(#ld-g)"/>
+                        <circle cx="40" cy="28" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="40" y="31" text-anchor="middle" font-size="5" fill="white" font-weight="700">R</text>
+                        <circle cx="75" cy="28" r="4" fill="none" stroke="#2e7d32" stroke-width="1.5"/>
+                        <text x="75" y="46" text-anchor="middle" font-size="5.5" fill="#2e7d32">goal</text>
+                        <text x="25" y="14" font-size="5.5" fill="#888">dark</text><text x="85" y="14" font-size="5.5" fill="#888">light</text>
+                        <text x="145" y="26" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="158" y="10" width="38" height="14" rx="3" fill="#5b6abf"/><text x="177" y="20" text-anchor="middle" font-size="5" fill="white" font-weight="600">MoveL</text>
+                        <rect x="200" y="10" width="38" height="14" rx="3" fill="#5b6abf"/><text x="219" y="20" text-anchor="middle" font-size="5" fill="white" font-weight="600">MoveR</text>
+                        <circle cx="190" cy="38" r="7" fill="#bbdefb" stroke="#1565c0" stroke-width="1"/><text x="190" y="41" text-anchor="middle" font-size="5" fill="#1565c0" font-weight="700">B</text>
+                        <rect x="215" y="33" width="50" height="11" rx="5" fill="#ff9800" opacity="0.5"/><text x="240" y="41" text-anchor="middle" font-size="5" fill="white" font-weight="600">At(B)~3.2</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: LD(5)</span><span class="domain-tag">Test: LD(10)</span><span class="domain-tag hl">2x scale</span></div>
+                </div>
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#2e7d32,#81c784);">RS</div><span class="domain-name-e">RockSample(n,k)</span></div>
+                    <p class="domain-desc-e">Information gathering on n×n grid with k rocks of unknown quality. Distance-dependent noisy sensor for checking rocks.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <rect x="5" y="5" width="110" height="45" rx="3" fill="#f5f5f5" stroke="#bbb"/>
+                        <polygon points="30,20 35,12 40,20" fill="#81c784" stroke="#388e3c" stroke-width="1"/><text x="35" y="30" text-anchor="middle" font-size="4.5" fill="#388e3c">R1</text>
+                        <polygon points="70,30 75,22 80,30" fill="#9e9e9e" stroke="#666" stroke-width="1" opacity="0.5"/><text x="75" y="40" text-anchor="middle" font-size="4.5" fill="#666">R2?</text>
+                        <circle cx="20" cy="35" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="20" y="38" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">R</text>
+                        <rect x="100" y="5" width="8" height="45" fill="#e8f5e9" opacity="0.5"/>
+                        <text x="130" y="28" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="142" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="161" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Check</text>
+                        <rect x="185" y="5" width="42" height="12" rx="3" fill="#5b6abf"/><text x="206" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Sample</text>
+                        <rect x="232" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="251" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">MoveE</text>
+                        <circle cx="165" cy="32" r="7" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/><text x="165" y="35" text-anchor="middle" font-size="5" fill="#2e7d32" font-weight="700">R1</text>
+                        <circle cx="210" cy="32" r="7" fill="#e8e8e8" stroke="#666" stroke-width="1"/><text x="210" y="35" text-anchor="middle" font-size="5" fill="#555" font-weight="700">R2</text>
+                        <rect x="145" y="44" width="42" height="10" rx="5" fill="#ff9800" opacity="0.8"/><text x="166" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">Good 0.75</text>
+                        <rect x="195" y="44" width="38" height="10" rx="5" fill="#ff9800" opacity="0.4"/><text x="214" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">Good 0.4</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: RS(5,5)-(10,10)</span><span class="domain-tag">Test: RS(25,25)</span><span class="domain-tag hl">6.25x area</span></div>
+                </div>
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#e65100,#ff9800);">MOS</div><span class="domain-name-e">MultiObjectSearch(n,k)</span></div>
+                    <p class="domain-desc-e">Find and declare k hidden objects on n×n grid using range-limited sensor with detection probability.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <rect x="5" y="5" width="110" height="45" rx="3" fill="#fff8e1" stroke="#ffb300"/>
+                        <rect x="55" y="20" width="10" height="10" rx="1" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="2,1.5"/><text x="60" y="40" text-anchor="middle" font-size="4" fill="#e65100">T1?</text>
+                        <rect x="80" y="10" width="10" height="10" rx="1" fill="none" stroke="#e65100" stroke-width="1.5" stroke-dasharray="2,1.5"/><text x="85" y="28" text-anchor="middle" font-size="4" fill="#e65100">T2?</text>
+                        <circle cx="30" cy="35" r="12" fill="#42a5f5" opacity="0.1" stroke="#42a5f5" stroke-width="0.6" stroke-dasharray="2,2"/>
+                        <circle cx="30" cy="35" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="30" y="38" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">R</text>
+                        <text x="130" y="28" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="142" y="5" width="32" height="12" rx="3" fill="#5b6abf"/><text x="158" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Look</text>
+                        <rect x="178" y="5" width="48" height="12" rx="3" fill="#5b6abf"/><text x="202" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Declare(T1)</text>
+                        <rect x="230" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="249" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Move</text>
+                        <circle cx="168" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1"/><text x="168" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">T1</text>
+                        <circle cx="215" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1"/><text x="215" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">T2</text>
+                        <rect x="145" y="44" width="45" height="10" rx="5" fill="#ff9800" opacity="0.5"/><text x="167" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(T1)? 0.5</text>
+                        <rect x="198" y="44" width="45" height="10" rx="5" fill="#ff9800" opacity="0.35"/><text x="220" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(T2)? 0.3</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: MOS(3,2)-(4,3)</span><span class="domain-tag">Test: MOS(8,6)</span><span class="domain-tag hl">4x area, 2x obj</span></div>
+                </div>
+                <div class="domain-card-embed">
+                    <div class="domain-header-e"><div class="domain-icon-e" style="background:linear-gradient(135deg,#5b6abf,#9c27b0);">RG</div><span class="domain-name-e">Rearrangement(n,k)</span></div>
+                    <p class="domain-desc-e">Locate k objects with unknown positions and transport them to goal locations. Combines perception with multi-step manipulation.</p>
+                    <svg width="100%" viewBox="0 0 280 55">
+                        <rect x="5" y="5" width="110" height="45" rx="3" fill="#f3e5f5" stroke="#9c27b0" opacity="0.5"/>
+                        <text x="85" y="17" font-size="8" fill="#2e7d32" opacity="0.4" font-weight="700">X</text>
+                        <text x="85" y="42" font-size="8" fill="#2e7d32" opacity="0.4" font-weight="700">X</text>
+                        <rect x="20" y="22" width="10" height="10" rx="1" fill="#ff9800" stroke="#e65100" stroke-width="1.5"/><text x="25" y="30" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">P1</text>
+                        <rect x="55" y="10" width="10" height="10" rx="1" fill="#ff9800" stroke="#e65100" stroke-width="1" opacity="0.5" stroke-dasharray="2,1.5"/><text x="60" y="18" text-anchor="middle" font-size="4" fill="#e65100">P2?</text>
+                        <circle cx="40" cy="35" r="5" fill="#42a5f5" stroke="#1565c0" stroke-width="1.5"/><text x="40" y="38" text-anchor="middle" font-size="4.5" fill="white" font-weight="700">R</text>
+                        <text x="130" y="28" font-size="6" fill="#ccc">&#8594;</text>
+                        <rect x="142" y="5" width="38" height="12" rx="3" fill="#5b6abf"/><text x="161" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Pick(P1)</text>
+                        <rect x="184" y="5" width="32" height="12" rx="3" fill="#5b6abf"/><text x="200" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Look</text>
+                        <rect x="220" y="5" width="35" height="12" rx="3" fill="#5b6abf"/><text x="237" y="14" text-anchor="middle" font-size="5" fill="white" font-weight="600">Move</text>
+                        <circle cx="165" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1"/><text x="165" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">P1</text>
+                        <circle cx="210" cy="32" r="7" fill="#fff3e0" stroke="#e65100" stroke-width="1" opacity="0.5"/><text x="210" y="35" text-anchor="middle" font-size="5" fill="#e65100" font-weight="700">P2</text>
+                        <rect x="145" y="44" width="42" height="10" rx="5" fill="#ff9800" opacity="0.7"/><text x="166" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(P1) 0.7</text>
+                        <rect x="195" y="44" width="42" height="10" rx="5" fill="#ff9800" opacity="0.35"/><text x="216" y="51" text-anchor="middle" font-size="4.5" fill="white" font-weight="600">At(P2)? 0.3</text>
+                    </svg>
+                    <div class="domain-tags"><span class="domain-tag">Train: RG(3,2)-(4,3)</span><span class="domain-tag">Test: RG(8,5)</span><span class="domain-tag hl">4x area, 2.5x obj</span></div>
+                </div>
+            </div>
+            <!-- End Domain Gallery -->
+
             <hr>
         </div>
 
