@@ -1,0 +1,36 @@
+% GammaZero — Resume / CV Description
+% Updated: 2025
+% Based on AAAI 2026 submission results
+%
+% Two versions provided:
+%   1. Concise (4 bullets) — for space-constrained resumes
+%   2. Detailed (6 bullets) — for expanded CV or project portfolio
+%
+% ============================================================
+% VERSION 1: Concise (4 bullets)
+% ============================================================
+
+\textbf{GammaZero: GNN Framework for Scalable POMDP Planning} \hfill \textit{2025}
+\vspace{0.1cm}
+\begin{itemize}
+\item Built GNN-guided MCTS planner that matched state-of-the-art (BetaZero) on same-size benchmarks (20.5 vs 20.15 avg return on RockSample; +4.3\% on LightDark) while outperforming classical baselines (POMCPOW, DESPOT) by up to 84\%
+\item Enabled zero-shot generalization from 5$\times$5--10$\times$10 training grids to 25$\times$25 test instances (2--6$\times$ grid area, state spaces scaling from 12,800 to 400M+), where 3 of 4 classical baselines timed out on 6 of 10 large-scale configurations
+\item Achieved 2.9$\times$ higher returns than best classical method on out-of-distribution LightDark; validated across 4 POMDP domains against 4 baselines (BetaZero, POMCPOW, DESPOT, AdaOPS) over 100 evaluation episodes each
+\item Designed uncertainty-aware graph representation (4 node types, 3 edge categories) with attention-weighted message passing; trained in 2--4 hrs on a single RTX 3080 GPU
+\end{itemize}
+
+
+% ============================================================
+% VERSION 2: Detailed (6 bullets)
+% ============================================================
+
+\textbf{GammaZero: GNN Framework for Scalable POMDP Planning} \hfill \textit{2025}
+\vspace{0.1cm}
+\begin{itemize}
+\item Built GNN-guided Monte Carlo Tree Search framework for POMDP planning; matched BetaZero (state-of-the-art) with 20.5 vs 20.15 avg return on RockSample(15,15) and exceeded by 4.3\% on LightDark(10), while outperforming POMCPOW by 84\% on RockSample
+\item Enabled zero-shot transfer from small training instances (5$\times$5--10$\times$10 grids, 5--10 objects) to test problems 2--6$\times$ larger in grid area (up to 25$\times$25) and up to 2$\times$ more objects, scaling state spaces from 12,800 to 400M+ without retraining
+\item Surpassed best classical baseline by 2.9$\times$ on out-of-distribution LightDark(10) (15.2 vs 5.22 return); classical planners (POMCPOW, DESPOT) timed out on 6 of 10 large-scale test configurations while GammaZero maintained positive returns across all
+\item Extended to 2 domains unsupported by BetaZero (MultiObjectSearch, Rearrangement); achieved 62\% higher returns than AdaOPS on Rearrangement(5,2) and 16\% higher on MOS(5,3) at same problem size
+\item Designed action-centric belief graph representation encoding particle-based uncertainty as graph topology: 4 node types (object, attribute, action, global), 3 edge categories with belief-weighted features, and threshold-based sparsity for efficient inference
+\item Trained 3-layer GNN with attention-weighted message passing in 2--4 hrs on single RTX 3080; evaluated across 4 POMDP domains (LightDark, RockSample, MultiObjectSearch, Rearrangement) against 4 baselines over 100 episodes each; submitted to AAAI 2026
+\end{itemize}
